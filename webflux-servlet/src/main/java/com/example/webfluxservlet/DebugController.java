@@ -19,4 +19,15 @@ public class DebugController {
     public Mono<String> mono() {
         return Mono.just("single mono!");
     }
+
+    @GetMapping("/sof")
+    public String sof() {
+        run();
+        return "oom";
+    }
+
+    private void run() {
+        Object o = new Object();
+        run();
+    }
 }

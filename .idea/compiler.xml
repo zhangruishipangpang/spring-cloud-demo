@@ -11,6 +11,7 @@
         <module name="webflux-servlet" />
         <module name="gateway" />
         <module name="netty-server" />
+        <module name="letter-server" />
       </profile>
     </annotationProcessing>
   </component>
