@@ -1,0 +1,55 @@
+server:
+    port: 9090
+    tomcat:
+        threads:
+            max: 10
+logging:
+    level:
+        org.springframework.security: trace
+#        org: trace
+spring:
+    jpa:
+        # 更新表结构，可以在控制台执行修改表结构的SQL语句
+        hibernate:
+            ddl-auto: update
+        show-sql: true
+        database: MYSQL
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbcUrl: jdbc:mysql://127.0.0.1:13306/self_database
+        url: jdbc:mysql://127.0.0.1:13306/self_database
+        username: root
+        password: 123456
+        #    初始化数量
+        initialSize: 5
+        #    允许的最小空闲连接数
+        minIdle: 5
+        #    最大活跃数
+        maxActive: 20
+        #    最大连接等待超时时间，单位是毫秒(ms)
+        maxWait: 60000
+        hikari:
+            maximum-pool-size: 5
+#        ======  h2  ======
+        # 嵌入模式，当前项目目录，进程关闭数据保留
+        # 详情见：http://www.h2database.com/html/features.html#database_url
+#        url: jdbc:h2:file:./data/self;DATABASE_TO_UPPER=false;MODE=MYSQL;DB_CLOSE_ON_EXIT=FALSE;
+#        jdbc-url: ${spring.datasource.url}
+#        username: root
+#        password: root
+#        driver-class-name: org.h2.Driver
+#        schema:
+#            - classpath: db/schema.sql
+#    h2:
+#        console:
+#            # 开启web控制台
+#            enabled: true
+#            # 访问路径url+/h2
+#            path: /h2
+#            settings:
+#                web-allow-others: true
+#        ======  h2  ======
+
+        
+        
+            
