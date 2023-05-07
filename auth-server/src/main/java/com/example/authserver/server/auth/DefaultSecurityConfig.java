@@ -1,39 +1,50 @@
 package com.example.authserver.server.auth;
 
-import com.example.authserver.server.auth.custom.ApplicationUserDetailsService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
+import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.savedrequest.NullRequestCache;
-import org.springframework.security.web.savedrequest.RequestCache;
-import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import static org.springframework.security.config.Customizer.withDefaults;
+import java.util.Arrays;
 
 /**
- * @author Joe Grandja
- * @since 0.1.0
+ * @author 长安
  */
+@Slf4j
 @Configuration(proxyBeanMethods = false)
 public class DefaultSecurityConfig {
+
+    JwtDecoder jwtDecoder;
+
+    @Autowired
+    public void setJwtDecoder(JwtDecoder jwtDecoder) {
+        this.jwtDecoder = jwtDecoder;
+    }
 
     // @formatter:off
     @Bean
     @Order(2)
     SecurityFilterChain defaultSecurityFilterChain(@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") HttpSecurity http) throws Exception {
+
+        AuthenticationManager sharedObject = http.getSharedObject(AuthenticationManager.class);
+        log.info("http share object -> {}", sharedObject);
+
         http
             .cors().and()
             .authorizeHttpRequests(authorize ->
@@ -55,41 +66,26 @@ public class DefaultSecurityConfig {
             .passwordParameter("pw")
 //            .successForwardUrl("/")
 //            .failureForwardUrl("/login")
+            .and()
+            .addFilterAfter(new BearerTokenAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class)
         ;
-        return http.build();
+        DefaultSecurityFilterChain build = http.build();
+
+        AuthenticationManager sharedObject1 = http.getSharedObject(AuthenticationManager.class);
+        log.info("http share object -> {}", sharedObject1);
+
+        return build;
     }
     // @formatter:on
 
-
-    // @formatter:off
-//    @Bean
-//    UserDetailsService users() {
-//        UserDetails user = User.withUsername("user1")
-//            .password(new BCryptPasswordEncoder().encode("123456"))
-//            .roles("USER")
-//            .build();
-//        return new InMemoryUserDetailsManager(user);
-//    }
-    // @formatter:on
 
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-//    @Bean
-//    SessionRegistry sessionRegistry() {
-//        return new SessionRegistryImpl();
-//    }
-//
-//    @Bean
-//    HttpSessionEventPublisher httpSessionEventPublisher() {
-//        return new HttpSessionEventPublisher();
-//    }
-
-//    @Bean
-//    RequestCache requestCache() {
-//        return new NullRequestCache();
-//    }
+    AuthenticationManager authenticationManager() {
+        return new ProviderManager(Arrays.asList(new JwtAuthenticationProvider(jwtDecoder)));
+    }
 
 }
