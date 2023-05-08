@@ -39,7 +39,7 @@ public class DefaultSecurityConfig {
 
     // @formatter:off
     @Bean
-    @Order(2)
+    @Order(200)
     SecurityFilterChain defaultSecurityFilterChain(@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") HttpSecurity http) throws Exception {
 
         AuthenticationManager sharedObject = http.getSharedObject(AuthenticationManager.class);

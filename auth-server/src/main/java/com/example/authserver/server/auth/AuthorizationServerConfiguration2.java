@@ -72,32 +72,32 @@ public class AuthorizationServerConfiguration2 {
         return http.build();
     }
 
-//    @Bean
-//    public RegisteredClientRepository registeredClientRepository() {
-//        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-//            .clientId("messaging-client")
-//            .clientSecret(new BCryptPasswordEncoder().encode("secret"))
-//            .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-//            .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-//            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-//            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-//            .redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
-//            .redirectUri("h ttp://127.0.0.1:8080/authorized")
-//            .scope(OidcScopes.OPENID)
-//            .scope(OidcScopes.PROFILE)
-//            .scope("message.read")
-//            .scope("message.write")
-//            .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
-//            .build();
-//
-//        return new InMemoryRegisteredClientRepository(registeredClient);
-//    }
-
     @Bean
-    public RegisteredClientRepository registeredClientRepository(@Qualifier("customJdbcTemplate") JdbcTemplate jdbcTemplate) {
+    public RegisteredClientRepository registeredClientRepository() {
+        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+            .clientId("messaging-client")
+            .clientSecret(new BCryptPasswordEncoder().encode("secret"))
+            .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+            .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+            .redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
+            .redirectUri("http://127.0.0.1:8080/authorized")
+            .scope(OidcScopes.OPENID)
+            .scope(OidcScopes.PROFILE)
+            .scope("message.read")
+            .scope("message.write")
+            .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+            .build();
 
-        return new JdbcRegisteredClientRepository(jdbcTemplate);
+        return new InMemoryRegisteredClientRepository(registeredClient);
     }
+
+//    @Bean
+//    public RegisteredClientRepository registeredClientRepository(@Qualifier("customJdbcTemplate") JdbcTemplate jdbcTemplate) {
+//
+//        return new JdbcRegisteredClientRepository(jdbcTemplate);
+//    }
 
     @Bean
     public JWKSource<SecurityContext> jwkSource() {
