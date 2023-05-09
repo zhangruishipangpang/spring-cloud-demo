@@ -17,10 +17,14 @@ public class Oauth2ApplicationUser {
     private Integer id;
 
     @Basic
-    @Column(name = "USER_NAME")
+    @Column(name = "USER_NAME", unique = true, length = 128)
     private String userName;
 
     @Basic
-    @Column(name = "PASSWORD")
+    @Column(name = "PASSWORD", length = 128)
     private String password;
+
+    @Basic
+    @Column(name = "uid", unique = true, length = 11)
+    private Integer uid;
 }

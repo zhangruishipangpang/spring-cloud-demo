@@ -17,37 +17,37 @@ public class Oauth2RegisteredClientEntity {
     @Column(name = "ID")
     private String id;
     @Basic
-    @Column(name = "CLIENT_ID")
+    @Column(name = "CLIENT_ID", length = 64)
     private String clientId;
     @Basic
     @Column(name = "CLIENT_ID_ISSUED_AT")
     private Timestamp clientIdIssuedAt;
     @Basic
-    @Column(name = "CLIENT_SECRET")
+    @Column(name = "CLIENT_SECRET", length = 128)
     private String clientSecret;
     @Basic
     @Column(name = "CLIENT_SECRET_EXPIRES_AT")
     private Timestamp clientSecretExpiresAt;
     @Basic
-    @Column(name = "CLIENT_NAME")
+    @Column(name = "CLIENT_NAME", length = 64)
     private String clientName;
     @Basic
-    @Column(name = "CLIENT_AUTHENTICATION_METHODS")
+    @Column(name = "CLIENT_AUTHENTICATION_METHODS", length = 128)
     private String clientAuthenticationMethods;
     @Basic
-    @Column(name = "AUTHORIZATION_GRANT_TYPES")
+    @Column(name = "AUTHORIZATION_GRANT_TYPES", length = 128)
     private String authorizationGrantTypes;
     @Basic
-    @Column(name = "REDIRECT_URIS")
+    @Column(name = "REDIRECT_URIS", length = 500)
     private String redirectUris;
     @Basic
-    @Column(name = "SCOPES")
+    @Column(name = "SCOPES", length = 128)
     private String scopes;
     @Basic
-    @Column(name = "CLIENT_SETTINGS")
+    @Column(name = "CLIENT_SETTINGS", length = 1000)
     private String clientSettings;
     @Basic
-    @Column(name = "TOKEN_SETTINGS")
+    @Column(name = "TOKEN_SETTINGS", length = 1000)
     private String tokenSettings;
 
     public String getId() {
