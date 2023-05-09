@@ -40,7 +40,7 @@ public class DefaultSecurityConfig {
     // @formatter:off
     @Bean
     @Order(200)
-    SecurityFilterChain defaultSecurityFilterChain(@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") HttpSecurity http) throws Exception {
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
         AuthenticationManager sharedObject = http.getSharedObject(AuthenticationManager.class);
         log.info("http share object -> {}", sharedObject);
@@ -70,9 +70,6 @@ public class DefaultSecurityConfig {
             .addFilterAfter(new BearerTokenAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class)
         ;
         DefaultSecurityFilterChain build = http.build();
-
-        AuthenticationManager sharedObject1 = http.getSharedObject(AuthenticationManager.class);
-        log.info("http share object -> {}", sharedObject1);
 
         return build;
     }

@@ -20,7 +20,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 
 /**
- * @Auther: 长安
+ * @author 长安
  */
 @Slf4j
 @Configuration
@@ -30,7 +30,6 @@ public class ResourceConfig {
 
     @Bean
     @Order(-100)
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     SecurityFilterChain resourceSecurityFilterChain(HttpSecurity http) throws Exception {
 
         http.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
@@ -45,13 +44,13 @@ public class ResourceConfig {
     }
 
     @Component
-    public class FailureEvents {
+    public static class FailureEvents {
         @EventListener
         public void onFailure(AuthenticationFailureBadCredentialsEvent badCredentials) {
             if (badCredentials.getAuthentication() instanceof BearerTokenAuthenticationToken bearerTokenAuthenticationToken) {
                 // ... handle
                 AuthenticationException ex = badCredentials.getException();
-                log.error("check Bearer Token error, exception is -> ", ex.getMessage());
+                log.error("check Bearer Token error, exception is -> {}", ex.getMessage());
             }
         }
     }
