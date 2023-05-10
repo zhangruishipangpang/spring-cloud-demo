@@ -8,11 +8,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="boot-l-jdk17" />
+        <module name="auth-server" />
+        <module name="common-tools" />
         <module name="webflux-servlet" />
         <module name="gateway" />
         <module name="netty-server" />
         <module name="letter-server" />
-        <module name="auth-server" />
       </profile>
     </annotationProcessing>
   </component>
