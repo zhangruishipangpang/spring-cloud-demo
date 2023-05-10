@@ -28,6 +28,7 @@
         <module>gateway</module>
         <module>netty-server</module>
         <module>webflux-servlet</module>
+        <module>common-tools</module>
     </modules>
 
     <dependencyManagement>

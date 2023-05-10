@@ -4,6 +4,8 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.time.Instant;
+import java.util.Base64;
 import java.util.UUID;
 
 import com.nimbusds.jose.jwk.JWKSet;
@@ -18,22 +20,22 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationCode;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationProvider;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationConsentAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
-import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
@@ -58,6 +60,21 @@ public class AuthorizationServerConfiguration2 {
         // 这里配置了当前 FilterChain 只会拦截oauth2相关的请求
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
+            .authorizationEndpoint(oAuth2AuthorizationEndpointConfigurer -> {
+                oAuth2AuthorizationEndpointConfigurer.authenticationProviders(authenticationProviders -> {
+                    for (AuthenticationProvider authenticationProvider : authenticationProviders) {
+                        log.info(" consumer authenticationProvider , current -> {} ", authenticationProvider.getClass().getName());
+                        if(authenticationProvider instanceof OAuth2AuthorizationCodeRequestAuthenticationProvider oAuth2AuthorizationCodeRequestAuthenticationProvider) {
+
+                            oAuth2AuthorizationCodeRequestAuthenticationProvider.setAuthorizationCodeGenerator(authorizationCodeGenerator());
+                        } else if(authenticationProvider instanceof OAuth2AuthorizationConsentAuthenticationProvider oAuth2AuthorizationConsentAuthenticationProvider) {
+
+                            oAuth2AuthorizationConsentAuthenticationProvider.setAuthorizationCodeGenerator(authorizationCodeGenerator());
+                        }
+                    }
+                });
+            })
+            .authorizationService(new InMemoryOAuth2AuthorizationService())     // 认证后token存储配置，默认在内存，可配置Redis与DB
             .oidc(Customizer.withDefaults());    // Enable OpenID Connect 1.0
         http
             // Redirect to the login page when not authenticated from the
@@ -67,7 +84,8 @@ public class AuthorizationServerConfiguration2 {
                     new LoginUrlAuthenticationEntryPoint("/login"))
             )
             // Accept access tokens for User Info and/or Client Registration
-            .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
+            .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
+        ;
 
         return http.build();
     }
@@ -134,5 +152,22 @@ public class AuthorizationServerConfiguration2 {
         return AuthorizationServerSettings.builder().build();
     }
 
+    /**
+     * 配置自定义的授权码 authorization_code，默认实现：OAuth2AuthorizationCodeGenerator
+     *      - 下面简单配置成为了 UUID 的形式。
+     */
+    public OAuth2TokenGenerator<OAuth2AuthorizationCode> authorizationCodeGenerator() {
+        return context -> {
+            log.info(" use custom authorization_code creator ");
+            if (context.getTokenType() == null ||
+                !OAuth2ParameterNames.CODE.equals(context.getTokenType().getValue())) {
+                return null;
+            }
+            String authorizationCode = UUID.randomUUID().toString().replaceAll("-", "");
+            Instant issuedAt = Instant.now();
+            Instant expiresAt = issuedAt.plus(context.getRegisteredClient().getTokenSettings().getAuthorizationCodeTimeToLive());
+            return new OAuth2AuthorizationCode(authorizationCode, issuedAt, expiresAt);
+        };
+    }
 
 }
