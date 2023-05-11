@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example</groupId>
+    <groupId>org.ca</groupId>
     <artifactId>spring-cloud-all</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>Spring-Cloud-Demo</name>
     <description>
         统一版本管理的父POM文件
@@ -16,12 +16,13 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <spring.cloud.alibaba.version>2021.0.4.0</spring.cloud.alibaba.version>
-        <spring.cloud.version>2021.0.4</spring.cloud.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <!--    spring.cloud.alibaba 对标 spring.cloud 2022.0.2 的只有预览版    -->
+        <spring.cloud.alibaba.version>2022.0.0.0-RC2</spring.cloud.alibaba.version>
+        <spring.cloud.version>2022.0.2</spring.cloud.version>
         <spring.cloud.netflix.ribbon>2.2.9.RELEASE</spring.cloud.netflix.ribbon>
-        <spring.boot.version>2.6.11</spring.boot.version>
+        <spring.boot.version>3.0.2</spring.boot.version>
     </properties>
 
     <modules>
@@ -29,6 +30,8 @@
         <module>netty-server</module>
         <module>webflux-servlet</module>
         <module>common-tools</module>
+        <module>letter-server</module>
+        <module>auth-server</module>
     </modules>
 
     <dependencyManagement>

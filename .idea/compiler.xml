@@ -12,10 +12,13 @@
         <module name="common-tools" />
         <module name="webflux-servlet" />
         <module name="gateway" />
-        <module name="netty-server" />
         <module name="letter-server" />
+        <module name="netty-server" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="spring-cloud-server" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
