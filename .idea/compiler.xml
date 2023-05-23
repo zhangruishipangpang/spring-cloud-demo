@@ -22,7 +22,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="boot-l-jdk17" options="-parameters" />
+      <module name="boot-l-jdk17" options="" />
     </option>
   </component>
 </project>

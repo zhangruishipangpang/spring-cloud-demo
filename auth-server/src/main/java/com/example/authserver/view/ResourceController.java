@@ -27,4 +27,10 @@ public class ResourceController {
         return Mono.just("message.write");
     }
 
+    @RequestMapping("/authed")
+    public Mono<String> resource3() {
+
+        return Mono.just("resource3");
+    }
+
 }

@@ -24,7 +24,7 @@ public class CustomFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-        logger.info("current request inter path is [{}]", httpServletRequest.getServletPath());
+        logger.info("current request inter path is [{}], FilterChain is [{}]", httpServletRequest.getServletPath(), chain);
         chain.doFilter(request, response);
         logger.info("current request outer path is [{}]", httpServletRequest.getServletPath());
     }

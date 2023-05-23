@@ -5,9 +5,13 @@ import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
-import java.util.Base64;
+import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
+import com.example.authserver.server.auth.custom.JwtKeyProperties;
+import com.example.authserver.server.auth.custom.SecurityContextFromHeaderTokenFilter;
+import com.example.authserver.server.auth.custom.token.DefaultTokenParser;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -15,17 +19,23 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationCode;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationProvider;
@@ -37,15 +47,40 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
+import org.springframework.security.web.util.UrlUtils;
 
 /**
  * @Auther: 长安
  */
-@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @Slf4j
 @Configuration
 public class AuthorizationServerConfiguration2 {
+
+
+    JwtDecoder jwtDecoder;
+
+    JwtEncoder jwtEncoder;
+
+    UserDetailsService userDetailsService;
+
+    @Autowired
+    public void setUserDetailsService(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
+    @Autowired
+    public void setJwtEncoder(JwtEncoder jwtEncoder) {
+        this.jwtEncoder = jwtEncoder;
+    }
+
+    @Autowired
+    public void setJwtDecoder(JwtDecoder jwtDecoder) {
+        this.jwtDecoder = jwtDecoder;
+    }
+
 
     /**
      * 配置 oauth2 相关接口的拦截执行链， 具体的接口配置在 AuthorizationServerSettings 中。
@@ -61,21 +96,13 @@ public class AuthorizationServerConfiguration2 {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
             .authorizationEndpoint(oAuth2AuthorizationEndpointConfigurer -> {
-                oAuth2AuthorizationEndpointConfigurer.authenticationProviders(authenticationProviders -> {
-                    for (AuthenticationProvider authenticationProvider : authenticationProviders) {
-                        log.info(" consumer authenticationProvider , current -> {} ", authenticationProvider.getClass().getName());
-                        if(authenticationProvider instanceof OAuth2AuthorizationCodeRequestAuthenticationProvider oAuth2AuthorizationCodeRequestAuthenticationProvider) {
-
-                            oAuth2AuthorizationCodeRequestAuthenticationProvider.setAuthorizationCodeGenerator(authorizationCodeGenerator());
-                        } else if(authenticationProvider instanceof OAuth2AuthorizationConsentAuthenticationProvider oAuth2AuthorizationConsentAuthenticationProvider) {
-
-                            oAuth2AuthorizationConsentAuthenticationProvider.setAuthorizationCodeGenerator(authorizationCodeGenerator());
-                        }
-                    }
-                });
+                oAuth2AuthorizationEndpointConfigurer.authenticationProviders(authenticationProvidersConsumer());
+//                oAuth2AuthorizationEndpointConfigurer.errorResponseHandler(authenticationFailureHandler());
             })
             .authorizationService(new InMemoryOAuth2AuthorizationService())     // 认证后token存储配置，默认在内存，可配置Redis与DB
-            .oidc(Customizer.withDefaults());    // Enable OpenID Connect 1.0
+            .oidc(Customizer.withDefaults()) // Enable OpenID Connect 1.0
+        ;
+
         http
             // Redirect to the login page when not authenticated from the
             // authorization endpoint
@@ -84,11 +111,18 @@ public class AuthorizationServerConfiguration2 {
                     new LoginUrlAuthenticationEntryPoint("/login"))
             )
             // Accept access tokens for User Info and/or Client Registration
-            .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
+//            .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
+            .securityContext().disable() // 关闭默认的session 和 request的存储用户登录信息方式，替换成 token
+            .csrf().disable()
+            .cors().disable()
+            .addFilterAt(new SecurityContextFromHeaderTokenFilter(new DefaultTokenParser(jwtEncoder, jwtDecoder), userDetailsService), SecurityContextHolderFilter.class)
         ;
+        // TODO 添加一个 TokenParserFilter
 
         return http.build();
     }
+
+
 
 //    @Bean
 //    public RegisteredClientRepository registeredClientRepository() {
@@ -117,46 +151,28 @@ public class AuthorizationServerConfiguration2 {
         return new JdbcRegisteredClientRepository(jdbcTemplate);
     }
 
-    @Bean
-    public JWKSource<SecurityContext> jwkSource() {
-        KeyPair keyPair = generateRsaKey();
-        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-        RSAKey rsaKey = new RSAKey.Builder(publicKey)
-            .privateKey(privateKey)
-            .keyID(UUID.randomUUID().toString())
-            .build();
-        JWKSet jwkSet = new JWKSet(rsaKey);
-        return new ImmutableJWKSet<>(jwkSet);
-    }
+    @Contract(pure = true)
+    private @NotNull Consumer<List<AuthenticationProvider>> authenticationProvidersConsumer() {
+        return (authenticationProviders) -> {
+            for (AuthenticationProvider authenticationProvider : authenticationProviders) {
+                log.info(" consumer authenticationProvider , current -> {} ", authenticationProvider.getClass().getName());
+                if(authenticationProvider instanceof OAuth2AuthorizationCodeRequestAuthenticationProvider oAuth2AuthorizationCodeRequestAuthenticationProvider) {
 
-    private static KeyPair generateRsaKey() {
-        KeyPair keyPair;
-        try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(2048);
-            keyPair = keyPairGenerator.generateKeyPair();
-        } catch (Exception ex) {
-            throw new IllegalStateException(ex);
-        }
-        return keyPair;
-    }
+                    oAuth2AuthorizationCodeRequestAuthenticationProvider.setAuthorizationCodeGenerator(authorizationCodeGenerator());
+                } else if(authenticationProvider instanceof OAuth2AuthorizationConsentAuthenticationProvider oAuth2AuthorizationConsentAuthenticationProvider) {
 
-    @Bean
-    public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
-        return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
-    }
-
-    @Bean
-    public AuthorizationServerSettings authorizationServerSettings() {
-        return AuthorizationServerSettings.builder().build();
+                    oAuth2AuthorizationConsentAuthenticationProvider.setAuthorizationCodeGenerator(authorizationCodeGenerator());
+                }
+            }
+        };
     }
 
     /**
      * 配置自定义的授权码 authorization_code，默认实现：OAuth2AuthorizationCodeGenerator
      *      - 下面简单配置成为了 UUID 的形式。
      */
-    public OAuth2TokenGenerator<OAuth2AuthorizationCode> authorizationCodeGenerator() {
+    @Contract(pure = true)
+    private @NotNull OAuth2TokenGenerator<OAuth2AuthorizationCode> authorizationCodeGenerator() {
         return context -> {
             log.info(" use custom authorization_code creator ");
             if (context.getTokenType() == null ||
@@ -167,6 +183,23 @@ public class AuthorizationServerConfiguration2 {
             Instant issuedAt = Instant.now();
             Instant expiresAt = issuedAt.plus(context.getRegisteredClient().getTokenSettings().getAuthorizationCodeTimeToLive());
             return new OAuth2AuthorizationCode(authorizationCode, issuedAt, expiresAt);
+        };
+    }
+
+
+    /**
+     * 配置 /oauth2/authorize 获取授权码接口的异常信息打印
+     * @return
+     */
+    public AuthenticationFailureHandler authenticationFailureHandler() {
+        String errHeader = "ERROR_MSG";
+        return (request, response, ex) -> {
+            String requestUrl = UrlUtils.buildFullRequestUrl(request);
+            log.info("获取授权码异常。 请求路径 : [{}]， 异常信息： [{}]", requestUrl, ex.getMessage());
+
+            response.setHeader(errHeader, ex.getMessage());
+            response.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+            response.flushBuffer();
         };
     }
 

@@ -1,27 +1,27 @@
 package com.example.authserver.server.auth;
 
+import com.example.authserver.server.auth.custom.JwtKeyProperties;
+import com.example.authserver.server.auth.custom.JwtTokenAuthenticationSuccessHandler;
+import com.example.authserver.server.auth.custom.SecurityContextFromHeaderTokenFilter;
+import com.example.authserver.server.auth.custom.token.DefaultTokenParser;
+import jakarta.servlet.Filter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
-import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
-import java.util.Arrays;
 
 /**
  * @author 长安
@@ -32,25 +32,35 @@ public class DefaultSecurityConfig {
 
     JwtDecoder jwtDecoder;
 
+    JwtEncoder jwtEncoder;
+
+    UserDetailsService userDetailsService;
+
+    @Autowired
+    public void setUserDetailsService(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
+    @Autowired
+    public void setJwtEncoder(JwtEncoder jwtEncoder) {
+        this.jwtEncoder = jwtEncoder;
+    }
+
     @Autowired
     public void setJwtDecoder(JwtDecoder jwtDecoder) {
         this.jwtDecoder = jwtDecoder;
     }
 
-    // @formatter:off
     @Bean
     @Order(200)
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-
-        AuthenticationManager sharedObject = http.getSharedObject(AuthenticationManager.class);
-        log.info("http share object -> {}", sharedObject);
 
         http
             .cors().and()
             .authorizeHttpRequests(authorize ->
                 authorize
                     .requestMatchers("/auth/**").hasRole("USER")
-                    .requestMatchers("/unAuth/**", "/login", "/favicon.ico").permitAll()
+                    .requestMatchers("/unAuth/**", "/login", "/favicon.ico", "/error").permitAll()
                     .requestMatchers(
                         new AntPathRequestMatcher("/h2/**", HttpMethod.GET.name()),
                         new AntPathRequestMatcher("/h2/**", HttpMethod.POST.name())
@@ -61,28 +71,33 @@ public class DefaultSecurityConfig {
             .headers().frameOptions().sameOrigin()
             .and()
             .csrf().disable()
+            .cors().disable()
             .formLogin()
+            .successHandler(authenticationSuccessHandler())
             .usernameParameter("un")
             .passwordParameter("pw")
-//            .successForwardUrl("/")
-//            .failureForwardUrl("/login")
             .and()
-            .addFilterAfter(new BearerTokenAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+            .addFilterAt(securityContextFromHeaderTokenFilter(), SecurityContextHolderFilter.class)
+            .securityContext().disable() // 去除Session 处理，使用 JWT Token 方式认证
+            .requestCache().disable()
         ;
-        DefaultSecurityFilterChain build = http.build();
 
+        DefaultSecurityFilterChain build = http.build();
         return build;
     }
     // @formatter:on
 
+    private AuthenticationSuccessHandler authenticationSuccessHandler() {
+        return new JwtTokenAuthenticationSuccessHandler(new DefaultTokenParser(jwtEncoder, jwtDecoder));
+    }
+
+    private Filter securityContextFromHeaderTokenFilter() {
+        return new SecurityContextFromHeaderTokenFilter(new DefaultTokenParser(jwtEncoder, jwtDecoder), userDetailsService);
+    }
 
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    AuthenticationManager authenticationManager() {
-        return new ProviderManager(Arrays.asList(new JwtAuthenticationProvider(jwtDecoder)));
     }
 
 }

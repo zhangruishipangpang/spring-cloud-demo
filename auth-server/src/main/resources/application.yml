@@ -6,6 +6,7 @@ server:
 logging:
     level:
         org.springframework.security: trace
+        com.example: trace
 #        org: trace
 spring:
     jpa:
@@ -49,7 +50,12 @@ spring:
 #            settings:
 #                web-allow-others: true
 #        ======  h2  ======
-
-        
-        
-            
+    
+    
+    
+    
+    security:
+        filter:
+            dispatcher-types:
+                - request
+#                - error

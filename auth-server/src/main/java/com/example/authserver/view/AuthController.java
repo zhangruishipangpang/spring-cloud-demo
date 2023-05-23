@@ -62,10 +62,15 @@ public class AuthController {
         return Mono.just("role");
     }
 
-
     @GetMapping("/")
     public Mono<String> loginS() {
 
         return Mono.just("login success!");
+    }
+
+    @GetMapping("/authed")
+    public Mono<String> authed() {
+
+        return Mono.just("authed");
     }
 }

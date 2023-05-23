@@ -1,0 +1,29 @@
+server:
+    port: 11001
+logging:
+    level:
+        org.springframework.web: trace
+        org.springframework.security: trace
+spring:
+    cloud:
+        gateway:
+            routes:
+                - id: test
+                  uri: http://127.0.0.1:8080
+                  predicates:
+                      - Path=/test/**
+
+    security:
+        oauth2:
+            client:
+                registration:
+                    okta:
+                     client-id: messaging-client
+                     client-secret: secret
+                     authorization-grant-type: authorization_code
+                     redirect-uri: http://127.0.0.1:11001/unAuth/receiver
+                     scope: message.read
+                provider:
+                    okta:
+                     authorization-uri: http://127.0.0.1:9090/oauth2/authorize
+                     token-uri: http://127.0.0.1:9090/oauth2/token
