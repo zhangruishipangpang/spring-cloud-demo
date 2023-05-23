@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Configuration
-//@EnableMethodSecurity(securedEnabled = true)
+@EnableMethodSecurity(securedEnabled = true)
 public class ResourceConfig {
     JwtDecoder jwtDecoder;
 

@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/resource")
 public class ResourceController {
 
-    @PreAuthorize("hasAuthority('SCOPE_message.read')")
+    @PreAuthorize("hasAnyAuthority('SCOPE_message.read', 'TEMP_ALL')")
     @RequestMapping("/read")
     public Mono<String> resource1() {
 
