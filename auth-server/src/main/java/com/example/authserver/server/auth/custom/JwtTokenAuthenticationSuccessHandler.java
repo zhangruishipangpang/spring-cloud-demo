@@ -40,23 +40,23 @@ public class JwtTokenAuthenticationSuccessHandler implements AuthenticationSucce
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        String uuid = UUID.randomUUID().toString();
-        response.setHeader(HttpHeaders.AUTHORIZATION, uuid);
-        OAuth2AccessTokenResponse build = OAuth2AccessTokenResponse.withToken(generalToken(authentication))
+
+        Jwt jwt = generalToken(authentication);
+        // 用户认证返回的认证信息
+        OAuth2AccessTokenResponse oAuth2AccessTokenResponse = OAuth2AccessTokenResponse.withToken(jwt.getTokenValue())
             .tokenType(OAuth2AccessToken.TokenType.BEARER)
-            .refreshToken(null)
-            .expiresIn(10011L)
+            .expiresIn(jwt.getExpiresAt().getEpochSecond())
             .build();
         ServletServerHttpResponse httpResponse = new ServletServerHttpResponse(response);
-        accessTokenHttpResponseConverter.write(build, null, httpResponse);
+        accessTokenHttpResponseConverter.write(oAuth2AccessTokenResponse, null, httpResponse);
 
 
     }
 
-    private String generalToken(Authentication authentication) {
+    private Jwt generalToken(Authentication authentication) {
         UserTokenAdapter tokenAdapter = tokenParser.encode(authentication);
         Jwt jwt = (Jwt) tokenAdapter.get(Jwt.class);
         log.info("用户生成token -> {}", jwt);
-        return jwt.getTokenValue();
+        return jwt;
     }
 }

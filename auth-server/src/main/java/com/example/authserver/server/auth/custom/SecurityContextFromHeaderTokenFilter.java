@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.core.log.LogMessage;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -50,7 +51,7 @@ public class SecurityContextFromHeaderTokenFilter extends OncePerRequestFilter {
         try {
             Authentication authenticationResult = tokenParser.decode(token);
             UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationResult.getName());
-            UsernamePasswordAuthenticationToken authenticated = UsernamePasswordAuthenticationToken.authenticated(userDetails, null, userDetails.getAuthorities());
+            Authentication authenticated = UsernamePasswordAuthenticationToken.authenticated(userDetails, null, userDetails.getAuthorities());
             SecurityContext context = this.securityContextHolderStrategy.createEmptyContext();
             context.setAuthentication(authenticated);
             this.securityContextHolderStrategy.setContext(context);

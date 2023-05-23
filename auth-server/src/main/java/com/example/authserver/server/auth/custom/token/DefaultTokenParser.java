@@ -4,6 +4,10 @@ import com.example.authserver.server.auth.custom.JwtKeyProperties;
 import com.example.authserver.server.auth.custom.TokenParser;
 import com.example.authserver.server.auth.custom.UserTokenAdapter;
 import com.nimbusds.jose.shaded.gson.internal.LinkedTreeMap;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * @author: 长安
@@ -29,10 +34,18 @@ public class DefaultTokenParser implements TokenParser<Authentication> {
 
     final JwtEncoder jwtEncoder;
     final JwtDecoder jwtDecoder;
+    final JwtConfigSettings settings;
 
-    public DefaultTokenParser(JwtEncoder jwtEncoder, JwtDecoder jwtDecoder) {
+    public DefaultTokenParser(JwtEncoder jwtEncoder, JwtDecoder jwtDecoder, JwtConfigSettings jwtConfigSettings) {
+        Objects.requireNonNull(jwtEncoder, "jwtEncoder is null");
+        Objects.requireNonNull(jwtDecoder, "jwtDecoder is null");
         this.jwtEncoder = jwtEncoder;
         this.jwtDecoder = jwtDecoder;
+        this.settings = jwtConfigSettings;
+    }
+
+    public DefaultTokenParser(JwtEncoder jwtEncoder, JwtDecoder jwtDecoder) {
+        this(jwtEncoder, jwtDecoder, JwtConfigSettings.builder().build());
     }
 
 
@@ -41,12 +54,12 @@ public class DefaultTokenParser implements TokenParser<Authentication> {
         Objects.requireNonNull(authentication, "DefaultTokenParser#encode authentication is null");
         JwsHeader jwsHeader = JwsHeader.with(SignatureAlgorithm.RS256).keyId(jwtKeyProperties.getKeyId()).build();
         JwtClaimsSet.Builder jwtClaimsSetBuilder = JwtClaimsSet.builder();
-        jwtClaimsSetBuilder.id(UUID.randomUUID().toString())
-            .issuedAt(Instant.now().plus(1, ChronoUnit.HOURS))
-            .expiresAt(Instant.now().plus(3, ChronoUnit.HOURS))
+        jwtClaimsSetBuilder.id(settings.jti.get())
+            .expiresAt(settings.expiredAt.get())
+            .issuedAt(settings.issuedAt.get())
+            .issuer(settings.iss.get())
+            .subject(settings.sub.get())
             .claim(Authentication.class.getName(), authentication.getPrincipal())
-            .issuer("http://127.0.0.1:9090/problem/issuer")
-            .subject("custom subject")
         ;
 
         JwtEncoderParameters jwtEncoderParameters = JwtEncoderParameters.from(jwsHeader, jwtClaimsSetBuilder.build());
@@ -64,5 +77,22 @@ public class DefaultTokenParser implements TokenParser<Authentication> {
         } catch (Exception ex) {
             throw new InvalidBearerTokenException("Invalid Bearer Token. --c");
         }
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class JwtConfigSettings {
+        @Builder.Default
+        private Supplier<String> jti = () -> UUID.randomUUID().toString();
+        @Builder.Default
+        private Supplier<Instant> issuedAt = () -> Instant.now().plus(1, ChronoUnit.HOURS);
+        @Builder.Default
+        private Supplier<Instant> expiredAt = () -> Instant.now().plus(2, ChronoUnit.HOURS);
+        @Builder.Default
+        private Supplier<String> iss = () -> "http://127.0.0.1:9090/problem/";
+        @Builder.Default
+        private Supplier<String> sub = () -> "default sub";
     }
 }

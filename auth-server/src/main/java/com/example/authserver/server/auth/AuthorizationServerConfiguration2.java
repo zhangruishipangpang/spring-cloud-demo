@@ -1,22 +1,12 @@
 package com.example.authserver.server.auth;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import com.example.authserver.server.auth.custom.JwtKeyProperties;
 import com.example.authserver.server.auth.custom.SecurityContextFromHeaderTokenFilter;
 import com.example.authserver.server.auth.custom.token.DefaultTokenParser;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
-import com.nimbusds.jose.jwk.source.JWKSource;
-import com.nimbusds.jose.proc.SecurityContext;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Contract;
@@ -35,7 +25,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationCode;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationProvider;
@@ -59,26 +48,10 @@ import org.springframework.security.web.util.UrlUtils;
 @Configuration
 public class AuthorizationServerConfiguration2 {
 
+    final SecurityContextFromHeaderTokenFilter securityContextFromHeaderTokenFilter;
 
-    JwtDecoder jwtDecoder;
-
-    JwtEncoder jwtEncoder;
-
-    UserDetailsService userDetailsService;
-
-    @Autowired
-    public void setUserDetailsService(UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
-
-    @Autowired
-    public void setJwtEncoder(JwtEncoder jwtEncoder) {
-        this.jwtEncoder = jwtEncoder;
-    }
-
-    @Autowired
-    public void setJwtDecoder(JwtDecoder jwtDecoder) {
-        this.jwtDecoder = jwtDecoder;
+    public AuthorizationServerConfiguration2(SecurityContextFromHeaderTokenFilter securityContextFromHeaderTokenFilter) {
+        this.securityContextFromHeaderTokenFilter = securityContextFromHeaderTokenFilter;
     }
 
 
@@ -110,45 +83,24 @@ public class AuthorizationServerConfiguration2 {
                 .authenticationEntryPoint(
                     new LoginUrlAuthenticationEntryPoint("/login"))
             )
-            // Accept access tokens for User Info and/or Client Registration
-//            .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
             .securityContext().disable() // 关闭默认的session 和 request的存储用户登录信息方式，替换成 token
             .csrf().disable()
             .cors().disable()
-            .addFilterAt(new SecurityContextFromHeaderTokenFilter(new DefaultTokenParser(jwtEncoder, jwtDecoder), userDetailsService), SecurityContextHolderFilter.class)
+            // 添加一个 token 处理器
+            .addFilterAt(securityContextFromHeaderTokenFilter , SecurityContextHolderFilter.class)
         ;
-        // TODO 添加一个 TokenParserFilter
-
         return http.build();
     }
-
-
-
-//    @Bean
-//    public RegisteredClientRepository registeredClientRepository() {
-//        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-//            .clientId("messaging-client")
-//            .clientSecret(new BCryptPasswordEncoder().encode("secret"))
-//            .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-//            .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-//            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-//            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-//            .redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
-//            .redirectUri("http://127.0.0.1:8080/authorized")
-//            .scope(OidcScopes.OPENID)
-//            .scope(OidcScopes.PROFILE)
-//            .scope("message.read")
-//            .scope("message.write")
-//            .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
-//            .build();
-//
-//        return new InMemoryRegisteredClientRepository(registeredClient);
-//    }
 
     @Bean
     public RegisteredClientRepository registeredClientRepository(@Qualifier("customJdbcTemplate") JdbcTemplate jdbcTemplate) {
 
         return new JdbcRegisteredClientRepository(jdbcTemplate);
+    }
+
+    @Bean
+    public AuthorizationServerSettings authorizationServerSettings() {
+        return AuthorizationServerSettings.builder().build();
     }
 
     @Contract(pure = true)
@@ -186,21 +138,25 @@ public class AuthorizationServerConfiguration2 {
         };
     }
 
-
-    /**
-     * 配置 /oauth2/authorize 获取授权码接口的异常信息打印
-     * @return
-     */
-    public AuthenticationFailureHandler authenticationFailureHandler() {
-        String errHeader = "ERROR_MSG";
-        return (request, response, ex) -> {
-            String requestUrl = UrlUtils.buildFullRequestUrl(request);
-            log.info("获取授权码异常。 请求路径 : [{}]， 异常信息： [{}]", requestUrl, ex.getMessage());
-
-            response.setHeader(errHeader, ex.getMessage());
-            response.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
-            response.flushBuffer();
-        };
-    }
+//    @Bean
+//    public RegisteredClientRepository registeredClientRepository() {
+//        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+//            .clientId("messaging-client")
+//            .clientSecret(new BCryptPasswordEncoder().encode("secret"))
+//            .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+//            .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+//            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+//            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+//            .redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
+//            .redirectUri("http://127.0.0.1:8080/authorized")
+//            .scope(OidcScopes.OPENID)
+//            .scope(OidcScopes.PROFILE)
+//            .scope("message.read")
+//            .scope("message.write")
+//            .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+//            .build();
+//
+//        return new InMemoryRegisteredClientRepository(registeredClient);
+//    }
 
 }

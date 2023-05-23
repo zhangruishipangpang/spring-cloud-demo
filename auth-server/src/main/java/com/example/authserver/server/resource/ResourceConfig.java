@@ -57,6 +57,7 @@ public class ResourceConfig {
 
         http.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
 
+        // 第三方接入平台使用该接口获取用户资源
         RequestMatcher requestMatcher = new AntPathRequestMatcher("/resource/**");
         http.securityMatcher(requestMatcher);
 
