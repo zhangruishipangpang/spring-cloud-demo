@@ -8,6 +8,7 @@ import java.util.Objects;
 
 /**
  * @author: 长安
+ * 通用的返回适配器
  */
 public class UserTokenAdapter extends LinkedHashMap<Class<?>, Object> {
 

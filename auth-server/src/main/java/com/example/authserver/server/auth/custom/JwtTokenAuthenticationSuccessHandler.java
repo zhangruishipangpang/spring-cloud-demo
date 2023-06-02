@@ -28,6 +28,7 @@ import java.util.UUID;
  * 用户登录成功返回 token
  */
 @Slf4j
+@SuppressWarnings("rawtypes")
 public class JwtTokenAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final HttpMessageConverter<OAuth2AccessTokenResponse> accessTokenHttpResponseConverter = new OAuth2AccessTokenResponseHttpMessageConverter();

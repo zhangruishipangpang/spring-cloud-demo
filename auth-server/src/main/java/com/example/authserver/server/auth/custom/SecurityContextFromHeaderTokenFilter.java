@@ -25,7 +25,7 @@ import java.io.IOException;
  */
 public class SecurityContextFromHeaderTokenFilter extends OncePerRequestFilter {
 
-    private SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder
+    private final SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder
         .getContextHolderStrategy();
 
 

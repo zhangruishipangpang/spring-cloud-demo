@@ -54,8 +54,9 @@ public class DefaultTokenParser implements TokenParser<Authentication> {
         Objects.requireNonNull(authentication, "DefaultTokenParser#encode authentication is null");
         JwsHeader jwsHeader = JwsHeader.with(SignatureAlgorithm.RS256).keyId(jwtKeyProperties.getKeyId()).build();
         JwtClaimsSet.Builder jwtClaimsSetBuilder = JwtClaimsSet.builder();
-        jwtClaimsSetBuilder.id(settings.jti.get())
-            .expiresAt(settings.expiredAt.get())
+        jwtClaimsSetBuilder
+            .id(Objects.requireNonNull(settings.jti.get()))
+            .expiresAt(Objects.requireNonNull(settings.expiredAt.get()))
             .issuedAt(settings.issuedAt.get())
             .issuer(settings.iss.get())
             .subject(settings.sub.get())

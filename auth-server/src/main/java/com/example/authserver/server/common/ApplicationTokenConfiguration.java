@@ -103,16 +103,16 @@ public class ApplicationTokenConfiguration {
             JWSKeySelector<SecurityContext> jwsKeySelector = new JWSVerificationKeySelector<>(jwsAlgs, jwkSource);
             jwtProcessor.setJWSKeySelector(jwsKeySelector);
             // Override the default Nimbus claims set verifier as NimbusJwtDecoder handles it instead
-            jwtProcessor.setJWTClaimsSetVerifier((claims, context) -> {
-                if(context instanceof SimpleSecurityContext securityContext) {
-                    String customMapKey = "CUSTOM_KEY";
-                    Object customVal = securityContext.get(customMapKey);
-                    if(Objects.nonNull(customVal) && customVal instanceof String strCustomVal) {
-                        return ;
-                    }
-                    log.warn("当前jwt未配置自定义key.[{}]", customMapKey);
-                }
-            });
+//            jwtProcessor.setJWTClaimsSetVerifier((claims, context) -> {
+//                if(context instanceof SimpleSecurityContext securityContext) {
+//                    String customMapKey = "CUSTOM_KEY";
+//                    Object customVal = securityContext.get(customMapKey);
+//                    if(Objects.nonNull(customVal) && customVal instanceof String strCustomVal) {
+//                        return ;
+//                    }
+//                    log.warn("当前jwt未配置自定义key.[{}]", customMapKey);
+//                }
+//            });
             return new NimbusJwtDecoder(jwtProcessor);
         }
 

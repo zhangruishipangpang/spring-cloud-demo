@@ -77,7 +77,8 @@ public class ResourceConfig {
 
     @Component
     public static class FailureEvents {
-        @EventListener
+
+        @EventListener(classes = AuthenticationFailureBadCredentialsEvent.class)
         public void onFailure(AuthenticationFailureBadCredentialsEvent badCredentials) {
             if (badCredentials.getAuthentication() instanceof BearerTokenAuthenticationToken bearerTokenAuthenticationToken) {
                 // ... handle
