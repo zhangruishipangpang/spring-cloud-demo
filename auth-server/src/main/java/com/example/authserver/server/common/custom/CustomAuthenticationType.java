@@ -8,6 +8,7 @@ public interface CustomAuthenticationType {
 
     /**
      * 用户名密码
+     * e.g. 暂时不用配置，默认一定需要用户名密码，其他的则为多因子认证扩展项
      */
     public static class UsernamePasswordType implements CustomAuthenticationType {}
 

@@ -1,7 +1,11 @@
-package com.example.authserver.server.common.custom;
+package com.example.authserver.server.common.custom.provider;
 
+import com.example.authserver.server.common.custom.ProviderOrdered;
+import com.example.authserver.server.common.custom.UserCustomAuthenticationToken;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,7 +25,7 @@ import java.util.Objects;
  * for extension verificationCode and so on.
  * {@link org.springframework.security.authentication.dao.DaoAuthenticationProvider}
  */
-public class UserAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
+public class UserAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider implements Ordered {
 
     /**
      * The plaintext password used to perform
@@ -71,7 +75,7 @@ public class UserAuthenticationProvider extends AbstractUserDetailsAuthenticatio
     protected final UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
         prepareTimingAttackProtection();
         try {
-
+            preUserPasswordMatchChecks((UserCustomAuthenticationToken) authentication);
             UserDetails loadedUser = this.getUserDetailsService().loadUserByUsername(username);
             if (loadedUser == null) {
                 throw new InternalAuthenticationServiceException(
@@ -91,6 +95,11 @@ public class UserAuthenticationProvider extends AbstractUserDetailsAuthenticatio
         }
     }
 
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return UserCustomAuthenticationToken.class.isAssignableFrom(authentication);
+    }
+
     private void prepareTimingAttackProtection() {
         if (this.userNotFoundEncodedPassword == null) {
             this.userNotFoundEncodedPassword = this.passwordEncoder.encode(USER_NOT_FOUND_PASSWORD);
@@ -105,6 +114,11 @@ public class UserAuthenticationProvider extends AbstractUserDetailsAuthenticatio
     }
 
     @Override
+    public int getOrder() {
+        return ProviderOrdered.USER_AUTHENTICATION_PROVIDER.getOrder();
+    }
+
+    @Override
     protected void doAfterPropertiesSet() throws Exception {
         Objects.requireNonNull(this.userDetailsService, "userDetailsService is null");
     }
@@ -112,7 +126,7 @@ public class UserAuthenticationProvider extends AbstractUserDetailsAuthenticatio
     /**
      * 处理密码之前的验证
      */
-    protected void preUserPasswordMatchChecks(UsernamePasswordAuthenticationToken authentication) {
-        
+    protected void preUserPasswordMatchChecks(UserCustomAuthenticationToken authentication) {
+
     }
 }

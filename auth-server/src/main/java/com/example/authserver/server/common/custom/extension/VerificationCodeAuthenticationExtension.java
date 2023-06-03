@@ -3,12 +3,14 @@ package com.example.authserver.server.common.custom.extension;
 import com.example.authserver.server.common.custom.CustomAuthenticationType;
 import com.example.authserver.server.common.custom.UserCustomAuthenticationToken;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
 
 /**
  * @author: 长安
  */
+@Slf4j
 public class VerificationCodeAuthenticationExtension implements AuthenticationOperationExtension<UserCustomAuthenticationToken> {
 
     public static final String VERIFICATION_CODE_PARAMETER_KEY = "verificationCode";
@@ -23,6 +25,10 @@ public class VerificationCodeAuthenticationExtension implements AuthenticationOp
         }
 
         String verificationCode = getVerificationCode(request);
+
+        if(log.isDebugEnabled()) {
+            log.debug("[DEBUG]VerificationCodeAuthenticationExtension#extraAuthentication verificationCode -> [{}]", verificationCode);
+        }
         authentication.with(VERIFICATION_CODE_CLASS, verificationCode);
     }
 
