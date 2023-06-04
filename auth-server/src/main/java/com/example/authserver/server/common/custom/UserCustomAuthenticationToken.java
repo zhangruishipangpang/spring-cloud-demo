@@ -4,10 +4,12 @@ import com.example.authserver.server.common.custom.extension.VerificationCodeAut
 import com.example.authserver.server.common.custom.user.ClientAuthenticationMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author: 长安
@@ -18,7 +20,7 @@ public class UserCustomAuthenticationToken extends UsernamePasswordAuthenticatio
     public static final Object NULL_OBJ = new Object();
 
     private final Map<Class<? extends CustomAuthenticationType>, Boolean> authenticationTypeSwitch = new HashMap<>(DEFAULT_INITIAL_CAPACITY);
-    private final Map<Class<? extends CustomAuthenticationType>, Object> authenticationType = new HashMap<>(DEFAULT_INITIAL_CAPACITY);
+    private final Map<Class<? extends CustomAuthenticationType>, Map<String, Object>> authenticationType = new HashMap<>(DEFAULT_INITIAL_CAPACITY);
 
     private UserCustomAuthenticationToken(String verificationCode, Object principal, Object credentials) {
         this(principal, credentials);
@@ -40,8 +42,8 @@ public class UserCustomAuthenticationToken extends UsernamePasswordAuthenticatio
         return new UserCustomAuthenticationToken(principal, credentials, authorities);
     }
 
-    public UserCustomAuthenticationToken with(Class<? extends CustomAuthenticationType> authenticationType, Object materials) {
-        this.putAuthenticationType(authenticationType, materials);
+    public UserCustomAuthenticationToken with(Class<? extends CustomAuthenticationType> authenticationType, String materialKey, Object materials) {
+        this.putAuthenticationType(authenticationType, materialKey, materials);
         return this;
     }
 
@@ -54,16 +56,41 @@ public class UserCustomAuthenticationToken extends UsernamePasswordAuthenticatio
         return getAuthenticationTypeSwitch(authenticationType);
     }
 
-    public Object from(Class<? extends CustomAuthenticationType> authenticationType) {
-        return this.getAuthenticationType(authenticationType);
+    public Object from(Class<? extends CustomAuthenticationType> authenticationType, String materialKey) {
+        return this.getAuthenticationType(authenticationType, materialKey);
     }
 
-    private void putAuthenticationType(Class<? extends CustomAuthenticationType> authenticationType, Object materials) {
-        this.authenticationType.put(authenticationType, materials);
+    public String fromStrThrows(Class<? extends CustomAuthenticationType> authenticationType, String materialKey) {
+        if(this.getAuthenticationType(authenticationType, materialKey) instanceof String var1) {
+            return var1;
+        }
+        throw new ClassCastException("UserCustomAuthenticationToken#fromStr return value not String.class");
     }
 
-    private Object getAuthenticationType(Class<? extends CustomAuthenticationType> authenticationType) {
-        return this.authenticationType.getOrDefault(authenticationType, NULL_OBJ);
+    public String fromStr(Class<? extends CustomAuthenticationType> authenticationType, String materialKey) {
+        if(this.getAuthenticationType(authenticationType, materialKey) instanceof String var1) {
+            return var1;
+        }
+        return null;
+    }
+
+    private void putAuthenticationType(Class<? extends CustomAuthenticationType> authenticationType, String materialKey, Object materials) {
+        this.authenticationType.compute(authenticationType, (key, old) -> {
+            Map<String, Object> store = old;
+            if(Objects.isNull(store)) {
+                store = new HashMap<>(4);
+            }
+            store.put(materialKey, materials);
+            return store;
+        });
+    }
+
+    private Object getAuthenticationType(Class<? extends CustomAuthenticationType> authenticationType, String materialKey) {
+        Map<String, Object> store = this.authenticationType.get(authenticationType);
+        if(CollectionUtils.isEmpty(store)) {
+            return NULL_OBJ;
+        }
+        return store.getOrDefault(materialKey, NULL_OBJ);
     }
 
     private void putAuthenticationTypeSwitch(Class<? extends CustomAuthenticationType> authenticationType, Boolean enable) {

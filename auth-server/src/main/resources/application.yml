@@ -50,10 +50,6 @@ spring:
 #            settings:
 #                web-allow-others: true
 #        ======  h2  ======
-    
-    
-    
-    
     security:
         filter:
             dispatcher-types:

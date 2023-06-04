@@ -6,21 +6,31 @@ import com.example.authserver.server.auth.custom.token.DefaultTokenParser;
 import com.example.authserver.server.common.custom.CustomLoginConfigurer;
 import com.example.authserver.server.common.custom.UserAuthenticationFilter;
 import jakarta.servlet.Filter;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import java.io.IOException;
 
 /**
  * @author 长安
@@ -51,11 +61,8 @@ public class DefaultSecurityConfig {
             .authorizeHttpRequests(authorize ->
                 authorize
                     .requestMatchers("/auth/**").hasRole("USER")
-                    .requestMatchers("/unAuth/**", "/login", "/favicon.ico", "/error").permitAll()
-                    .requestMatchers(
-                        new AntPathRequestMatcher("/h2/**", HttpMethod.GET.name()),
-                        new AntPathRequestMatcher("/h2/**", HttpMethod.POST.name())
-                    ).permitAll()
+                    .requestMatchers("/unAuth/**", "/login",
+                        "/favicon.ico", "/error", "/verification_code/**").permitAll()
                     .requestMatchers("/").authenticated()
                     .anyRequest().authenticated()
             )
@@ -79,7 +86,19 @@ public class DefaultSecurityConfig {
 
         http.apply(new CustomLoginConfigurer<>())
                 .successHandler(authenticationSuccessHandler())
-            .loginProcessingUrl(UserAuthenticationFilter.DEFAULT_LOGIN_PATH)
+                .loginProcessingUrl(UserAuthenticationFilter.DEFAULT_LOGIN_PATH)
+                .failureHandler(new AuthenticationFailureHandler() {
+                    @Override
+                    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+                        log.info("[ERROR]login failure, error msg -> {}", exception.getMessage());
+                        log.error("[ERROR]login failure, error msg -> ", exception);
+
+                        ServletServerHttpResponse httpResponse = new ServletServerHttpResponse(response);
+                        httpResponse.setStatusCode(HttpStatusCode.valueOf(500));
+                        httpResponse.getBody().write(exception.getMessage().getBytes());
+                        httpResponse.getBody().flush();
+                    }
+                })
         ;
 
 
