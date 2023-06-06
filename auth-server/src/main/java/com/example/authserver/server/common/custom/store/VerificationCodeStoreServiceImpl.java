@@ -2,6 +2,7 @@ package com.example.authserver.server.common.custom.store;
 
 import com.example.authserver.model.verficationcode.KaptchaImage;
 import com.example.authserver.service.VerificationCodeService;
+import com.example.authserver.service.impl.VerificationCodeServiceImpl;
 
 import java.io.OutputStream;
 import java.util.HashMap;
@@ -14,6 +15,10 @@ import java.util.Objects;
 public class VerificationCodeStoreServiceImpl
     extends HashMap<String, KaptchaImage> implements VerificationCodeStoreService {
 
+    public VerificationCodeStoreServiceImpl() {
+        // for testing
+        put("123456", KaptchaImage.builder().text("1234").bufferedImage(null).id("123456").build());
+    }
 
     @Override
     public KaptchaImage setVerificationCode(KaptchaImage kaptchaImage) {

@@ -1,6 +1,6 @@
 package com.example.authserver.server.resource;
 
-import com.example.authserver.server.auth.custom.SecurityContextFromHeaderTokenFilter;
+import com.example.authserver.server.common.custom.SecurityContextFromHeaderTokenFilter;
 import com.example.authserver.server.auth.custom.token.DefaultTokenParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

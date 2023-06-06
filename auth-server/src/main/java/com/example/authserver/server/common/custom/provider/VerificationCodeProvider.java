@@ -10,6 +10,8 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -61,6 +63,13 @@ public class VerificationCodeProvider extends UserAuthenticationProvider {
             throw new VerificationCodeException("verificationCode not match");
         }
         verificationCodeStoreService.evictVerificationCode(verificationId);
+    }
+
+    @Override
+    protected Authentication createSuccessAuthentication(Object principal, Authentication authentication, UserDetails user) {
+        Authentication var1 = super.createSuccessAuthentication(principal, authentication, user);
+        // fill some self data
+        return UserCustomAuthenticationToken.of(var1);
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.example.authserver.server.common.custom;
 import com.example.authserver.server.common.custom.extension.VerificationCodeAuthenticationExtension;
 import com.example.authserver.server.common.custom.user.ClientAuthenticationMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.CollectionUtils;
 
@@ -32,6 +33,13 @@ public class UserCustomAuthenticationToken extends UsernamePasswordAuthenticatio
 
     public UserCustomAuthenticationToken(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
         super(principal, credentials, authorities); // 已认证
+    }
+
+    public static UserCustomAuthenticationToken of(Authentication authentication) {
+        Objects.requireNonNull(authentication, "usernamePasswordAuthenticationToken is null");
+        UserCustomAuthenticationToken userCustomAuthenticationToken = new UserCustomAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials(), authentication.getAuthorities());
+        userCustomAuthenticationToken.setDetails(userCustomAuthenticationToken.getDetails());
+        return userCustomAuthenticationToken;
     }
 
     public static UserCustomAuthenticationToken of(Object principal, Object credentials) {

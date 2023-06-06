@@ -1,8 +1,10 @@
 package com.example.authserver.server.common;
 
 import com.example.authserver.server.auth.custom.JwtKeyProperties;
-import com.example.authserver.server.auth.custom.SecurityContextFromHeaderTokenFilter;
+import com.example.authserver.server.common.custom.SecurityContextFromHeaderTokenFilter;
 import com.example.authserver.server.auth.custom.token.DefaultTokenParser;
+import com.example.authserver.server.common.custom.store.TokenStoreService;
+import com.example.authserver.server.common.custom.store.TokenStoreServiceImpl;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -11,10 +13,8 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.JWSKeySelector;
 import com.nimbusds.jose.proc.JWSVerificationKeySelector;
 import com.nimbusds.jose.proc.SecurityContext;
-import com.nimbusds.jose.proc.SimpleSecurityContext;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
-import jakarta.servlet.Filter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +29,6 @@ import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -39,6 +38,11 @@ import java.util.Set;
 @Configuration
 public class ApplicationTokenConfiguration {
 
+
+    @Bean
+    public TokenStoreService tokenStoreService() {
+        return new TokenStoreServiceImpl();
+    }
 
     @Configuration
     public static class TokenHandlerConfiguration {

@@ -60,7 +60,7 @@ public class DefaultTokenParser implements TokenParser<Authentication> {
             .issuedAt(settings.issuedAt.get())
             .issuer(settings.iss.get())
             .subject(settings.sub.get())
-            .claim(Authentication.class.getName(), authentication.getPrincipal())
+            .claim(Authentication.class.getName(), authentication.getName())
         ;
 
         JwtEncoderParameters jwtEncoderParameters = JwtEncoderParameters.from(jwsHeader, jwtClaimsSetBuilder.build());
@@ -70,11 +70,12 @@ public class DefaultTokenParser implements TokenParser<Authentication> {
 
     @Override
     public Authentication decode(String token) {
-        Jwt jwt = jwtDecoder.decode(token);
-        Object o = jwt.getClaims().get(Authentication.class.getName());
-        LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) o;
         try {
-            return new UsernamePasswordAuthenticationToken(map.get("username"), null, null);
+            Jwt jwt = jwtDecoder.decode(token);
+            if(jwt.getClaims().get(Authentication.class.getName()) instanceof String username) {
+                return new UsernamePasswordAuthenticationToken(username, null, null);
+            }
+            throw new InvalidBearerTokenException("claims username not String.class");
         } catch (Exception ex) {
             throw new InvalidBearerTokenException("Invalid Bearer Token. --c");
         }
@@ -94,6 +95,6 @@ public class DefaultTokenParser implements TokenParser<Authentication> {
         @Builder.Default
         private Supplier<String> iss = () -> "http://127.0.0.1:9090/problem/";
         @Builder.Default
-        private Supplier<String> sub = () -> "default sub";
+        private Supplier<String> sub = () -> "system"; // or third party
     }
 }
