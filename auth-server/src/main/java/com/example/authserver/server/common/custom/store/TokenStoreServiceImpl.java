@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author: 长安
  */
-public class TokenStoreServiceImpl implements TokenStoreService{
+public class TokenStoreServiceImpl implements TokenStoreService<Authentication, String> {
 
     private final Map<String/*token*/, Authentication> tokenStore = new ConcurrentHashMap<>();
     private final Map<String/*username*/, String/*token*/> userTokenStore = new ConcurrentHashMap<>();

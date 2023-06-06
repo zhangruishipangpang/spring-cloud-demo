@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -33,7 +34,7 @@ public class DefaultSecurityConfig {
     final JwtEncoder jwtEncoder;
     final UserDetailsService userDetailsService;
     final AuthenticationManager authenticationManager;
-    final TokenStoreService tokenStoreService;
+    final TokenStoreService<Authentication, String> tokenStoreService;
 
     public DefaultSecurityConfig(JwtDecoder jwtDecoder, JwtEncoder jwtEncoder, UserDetailsService userDetailsService, AuthenticationManager authenticationManager, TokenStoreService tokenStoreService) {
         this.jwtDecoder = jwtDecoder;

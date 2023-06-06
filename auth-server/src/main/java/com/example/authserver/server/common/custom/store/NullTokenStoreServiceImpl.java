@@ -5,7 +5,7 @@ import org.springframework.security.core.Authentication;
 /**
  * @author: 长安
  */
-public class NullTokenStoreServiceImpl implements TokenStoreService {
+public class NullTokenStoreServiceImpl implements TokenStoreService<Authentication, String> {
     @Override
     public String setToken(Authentication authentication, String token) {
         return null;

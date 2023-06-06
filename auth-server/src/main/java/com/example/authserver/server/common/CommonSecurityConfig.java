@@ -12,11 +12,13 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +42,4 @@ public class CommonSecurityConfig {
         return new ProviderManager(providerList);
     }
 
-    @Bean
-    public Filter securityContextFromHeaderTokenFilter(JwtEncoder jwtEncoder, JwtDecoder jwtDecoder, UserDetailsService userDetailsService, @Qualifier("oauth2TokenStoreService") TokenStoreService tokenStoreService) {
-        return new SecurityContextFromHeaderTokenFilter(new DefaultTokenParser(jwtEncoder, jwtDecoder), userDetailsService, tokenStoreService);
-    }
 }

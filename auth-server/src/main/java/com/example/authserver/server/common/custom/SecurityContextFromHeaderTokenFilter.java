@@ -23,6 +23,7 @@ import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * @author: 长安
@@ -44,7 +45,7 @@ public class SecurityContextFromHeaderTokenFilter extends OncePerRequestFilter {
         tokenAuthenticationConverter = new TokenAuthenticationConvert(tokenParser, new NullTokenStoreServiceImpl());
     }
 
-    public SecurityContextFromHeaderTokenFilter(TokenParser tokenParser, UserDetailsService userDetailsService, TokenStoreService tokenStoreService) {
+    public SecurityContextFromHeaderTokenFilter(TokenParser tokenParser, UserDetailsService userDetailsService, TokenStoreService<Authentication, String> tokenStoreService) {
         this.tokenParser = tokenParser;
         this.userDetailsService = userDetailsService;
         tokenAuthenticationConverter = new TokenAuthenticationConvert(tokenParser, tokenStoreService);
@@ -80,7 +81,8 @@ public class SecurityContextFromHeaderTokenFilter extends OncePerRequestFilter {
     }
 
     private boolean requireParseToken(HttpServletRequest request) {
-        return StringUtils.isNotBlank(findHeaderToken(request));
+        return StringUtils.isNotBlank(findHeaderToken(request)) &&
+            Objects.isNull(this.securityContextHolderStrategy.getContext());
     }
 
     private String findHeaderToken(HttpServletRequest request) {

@@ -60,11 +60,18 @@ public class AuthorizationServerConfiguration2 {
         // 这里配置了当前 FilterChain 只会拦截oauth2相关的请求
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
+            .tokenEndpoint(oAuth2TokenEndpointConfigurer -> {
+//                oAuth2TokenEndpointConfigurer.accessTokenResponseHandler(null);
+            })
             .authorizationEndpoint(oAuth2AuthorizationEndpointConfigurer -> {
                 oAuth2AuthorizationEndpointConfigurer.authenticationProviders(authenticationProvidersConsumer());
 //                oAuth2AuthorizationEndpointConfigurer.errorResponseHandler(authenticationFailureHandler());
             })
-            .authorizationService(new InMemoryOAuth2AuthorizationService())     // 认证后token存储配置，默认在内存，可配置Redis与DB
+            /*
+                认证后token存储配置，默认在内存，可配置Redis与DB
+                TODO 需要改造这里使其可以将token信息存储到缓存中
+             */
+            .authorizationService(new InMemoryOAuth2AuthorizationService())
             .oidc(Customizer.withDefaults()) // Enable OpenID Connect 1.0
         ;
 

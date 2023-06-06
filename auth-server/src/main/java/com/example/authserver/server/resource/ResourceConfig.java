@@ -61,7 +61,7 @@ public class ResourceConfig {
         http.csrf().disable();
         http.cors().disable();
 
-        http.addFilterAt(securityContextFromHeaderTokenFilter, SecurityContextHolderFilter.class);
+//        http.addFilterAt(securityContextFromHeaderTokenFilter, SecurityContextHolderFilter.class);
         return http.build();
     }
 

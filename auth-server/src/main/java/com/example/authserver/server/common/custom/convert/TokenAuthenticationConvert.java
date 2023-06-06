@@ -15,9 +15,9 @@ import org.springframework.security.web.authentication.AuthenticationConverter;
 public class TokenAuthenticationConvert implements AuthenticationConverter {
 
     private final TokenParser tokenParser;
-    private final TokenStoreService tokenStoreService;
+    private final TokenStoreService<Authentication, String> tokenStoreService;
 
-    public TokenAuthenticationConvert(TokenParser tokenParser, TokenStoreService tokenStoreService) {
+    public TokenAuthenticationConvert(TokenParser tokenParser, TokenStoreService<Authentication, String> tokenStoreService) {
         this.tokenParser = tokenParser;
         this.tokenStoreService = tokenStoreService;
     }

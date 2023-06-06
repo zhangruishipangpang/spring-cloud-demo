@@ -16,8 +16,10 @@ import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -40,7 +42,7 @@ public class ApplicationTokenConfiguration {
 
 
     @Bean
-    public TokenStoreService tokenStoreService() {
+    public TokenStoreService<Authentication, String> tokenStoreService() {
         return new TokenStoreServiceImpl();
     }
 
@@ -49,7 +51,7 @@ public class ApplicationTokenConfiguration {
      * @return oauth2TokenStoreService
      */
     @Bean(name = "oauth2TokenStoreService")
-    public TokenStoreService oauth2TokenStoreService() {
+    public TokenStoreService<Authentication, String> oauth2TokenStoreService() {
         return new TokenStoreServiceImpl();
     }
 
@@ -59,16 +61,18 @@ public class ApplicationTokenConfiguration {
         final JwtEncoder jwtEncoder;
         final JwtDecoder jwtDecoder;
         final UserDetailsService userDetailsService;
+        final TokenStoreService<Authentication, String> tokenStoreService;
 
-        public TokenHandlerConfiguration(JwtEncoder jwtEncoder, JwtDecoder jwtDecoder, UserDetailsService userDetailsService) {
+        public TokenHandlerConfiguration(JwtEncoder jwtEncoder, JwtDecoder jwtDecoder, UserDetailsService userDetailsService, @Qualifier("tokenStoreService") TokenStoreService<Authentication, String> tokenStoreService) {
             this.jwtEncoder = jwtEncoder;
             this.jwtDecoder = jwtDecoder;
             this.userDetailsService = userDetailsService;
+            this.tokenStoreService = tokenStoreService;
         }
 
         @Bean
         public SecurityContextFromHeaderTokenFilter securityContextFromHeaderTokenFilter() {
-            return new SecurityContextFromHeaderTokenFilter(new DefaultTokenParser(jwtEncoder, jwtDecoder), userDetailsService);
+            return new SecurityContextFromHeaderTokenFilter(new DefaultTokenParser(jwtEncoder, jwtDecoder), userDetailsService, tokenStoreService);
         }
     }
 
