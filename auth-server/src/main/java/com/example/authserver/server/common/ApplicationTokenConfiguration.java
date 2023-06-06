@@ -44,6 +44,15 @@ public class ApplicationTokenConfiguration {
         return new TokenStoreServiceImpl();
     }
 
+    /**
+     * oauth2 三方集成使用的token存储，与内部使用分开
+     * @return oauth2TokenStoreService
+     */
+    @Bean(name = "oauth2TokenStoreService")
+    public TokenStoreService oauth2TokenStoreService() {
+        return new TokenStoreServiceImpl();
+    }
+
     @Configuration
     public static class TokenHandlerConfiguration {
 

@@ -1,6 +1,11 @@
 package com.example.authserver.server.common;
 
+import com.example.authserver.server.auth.custom.token.DefaultTokenParser;
+import com.example.authserver.server.common.custom.SecurityContextFromHeaderTokenFilter;
 import com.example.authserver.server.common.custom.provider.UserAuthenticationProvider;
+import com.example.authserver.server.common.custom.store.TokenStoreService;
+import jakarta.servlet.Filter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
@@ -10,6 +15,8 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,4 +40,8 @@ public class CommonSecurityConfig {
         return new ProviderManager(providerList);
     }
 
+    @Bean
+    public Filter securityContextFromHeaderTokenFilter(JwtEncoder jwtEncoder, JwtDecoder jwtDecoder, UserDetailsService userDetailsService, @Qualifier("oauth2TokenStoreService") TokenStoreService tokenStoreService) {
+        return new SecurityContextFromHeaderTokenFilter(new DefaultTokenParser(jwtEncoder, jwtDecoder), userDetailsService, tokenStoreService);
+    }
 }

@@ -75,7 +75,7 @@ public class AuthorizationServerConfiguration2 {
                 .authenticationEntryPoint(
                     new LoginUrlAuthenticationEntryPoint("/login"))
             )
-            .securityContext().disable() // 关闭默认的session 和 request的存储用户登录信息方式，替换成 token
+            .securityContext().disable()
             .csrf().disable()
             .cors().disable()
             // 添加一个 token 处理器

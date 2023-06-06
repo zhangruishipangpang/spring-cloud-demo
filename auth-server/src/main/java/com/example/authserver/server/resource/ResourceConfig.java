@@ -3,7 +3,6 @@ package com.example.authserver.server.resource;
 import com.example.authserver.server.common.custom.SecurityContextFromHeaderTokenFilter;
 import com.example.authserver.server.auth.custom.token.DefaultTokenParser;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
@@ -30,26 +29,18 @@ import org.springframework.stereotype.Component;
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
 public class ResourceConfig {
-    JwtDecoder jwtDecoder;
+    final JwtDecoder jwtDecoder;
+    final JwtEncoder jwtEncoder;
+    final UserDetailsService userDetailsService;
+    final SecurityContextFromHeaderTokenFilter securityContextFromHeaderTokenFilter;
 
-    JwtEncoder jwtEncoder;
-
-    UserDetailsService userDetailsService;
-
-    @Autowired
-    public void setUserDetailsService(UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
-
-    @Autowired
-    public void setJwtEncoder(JwtEncoder jwtEncoder) {
-        this.jwtEncoder = jwtEncoder;
-    }
-
-    @Autowired
-    public void setJwtDecoder(JwtDecoder jwtDecoder) {
+    public ResourceConfig(JwtDecoder jwtDecoder, JwtEncoder jwtEncoder, UserDetailsService userDetailsService, SecurityContextFromHeaderTokenFilter securityContextFromHeaderTokenFilter) {
         this.jwtDecoder = jwtDecoder;
+        this.jwtEncoder = jwtEncoder;
+        this.userDetailsService = userDetailsService;
+        this.securityContextFromHeaderTokenFilter = securityContextFromHeaderTokenFilter;
     }
+
 
     @Bean
     @Order(-100)
@@ -70,8 +61,7 @@ public class ResourceConfig {
         http.csrf().disable();
         http.cors().disable();
 
-        http.addFilterAt(new SecurityContextFromHeaderTokenFilter(new DefaultTokenParser(jwtEncoder, jwtDecoder), userDetailsService), SecurityContextHolderFilter.class);
-
+        http.addFilterAt(securityContextFromHeaderTokenFilter, SecurityContextHolderFilter.class);
         return http.build();
     }
 
