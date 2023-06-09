@@ -5,8 +5,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import com.example.authserver.server.auth.custom.jackson.UserCustomAuthenticationTokenMixin;
 import com.example.authserver.server.common.custom.SecurityContextFromHeaderTokenFilter;
 
+import com.example.authserver.server.common.custom.UserCustomAuthenticationToken;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -15,9 +18,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.jackson2.SecurityJackson2Modules;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.server.authorization.*;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationProvider;
@@ -26,6 +31,7 @@ import org.springframework.security.oauth2.server.authorization.client.JdbcRegis
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.jackson2.OAuth2AuthorizationServerJackson2Module;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.security.web.SecurityFilterChain;
@@ -115,8 +121,21 @@ public class AuthorizationServerConfiguration2 {
      * @return OAuth2AuthorizationService
      */
     @Bean
-    public OAuth2AuthorizationService oAuth2AuthorizationService(@Qualifier("customJdbcTemplate") JdbcTemplate jdbcTemplate, RegisteredClientRepository registeredClientRepository) {
-        return new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
+    public OAuth2AuthorizationService oAuth2AuthorizationService(@Qualifier("customJdbcTemplate") JdbcTemplate jdbcTemplate, @Qualifier("registeredClientRepository") RegisteredClientRepository registeredClientRepository) {
+        JdbcOAuth2AuthorizationService authorizationService = new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
+        JdbcOAuth2AuthorizationService.OAuth2AuthorizationRowMapper authorizationRowMapper = new JdbcOAuth2AuthorizationService.OAuth2AuthorizationRowMapper(
+            registeredClientRepository);
+        authorizationRowMapper.setLobHandler(new DefaultLobHandler());
+        ObjectMapper objectMapper = new ObjectMapper();
+        ClassLoader classLoader = JdbcOAuth2AuthorizationService.class.getClassLoader();
+        List<com.fasterxml.jackson.databind.Module> securityModules = SecurityJackson2Modules.getModules(classLoader);
+        objectMapper.registerModules(securityModules);
+        objectMapper.registerModule(new OAuth2AuthorizationServerJackson2Module());
+        // 添加默认的反序列化器
+        objectMapper.addMixIn(UserCustomAuthenticationToken.class, UserCustomAuthenticationTokenMixin.class);
+        authorizationRowMapper.setObjectMapper(objectMapper);
+        authorizationService.setAuthorizationRowMapper(authorizationRowMapper);
+        return authorizationService;
     }
 
     /**

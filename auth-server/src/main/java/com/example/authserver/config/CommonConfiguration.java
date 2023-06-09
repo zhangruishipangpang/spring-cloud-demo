@@ -2,15 +2,15 @@ package com.example.authserver.config;
 
 import com.example.authserver.server.common.custom.store.VerificationCodeStoreService;
 import com.example.authserver.server.common.custom.store.VerificationCodeStoreServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.code.kaptcha.util.Config;
-import org.apache.catalina.core.ApplicationFilterChain;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.web.FilterChainProxy;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.jackson2.CoreJackson2Module;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -39,4 +39,12 @@ public class CommonConfiguration {
     public VerificationCodeStoreService verificationCodeStoreService() {
         return new VerificationCodeStoreServiceImpl();
     }
+
+//    @Bean
+//    public ObjectMapper objectMapper() {
+//        ObjectMapper mapper = new ObjectMapper();
+//        mapper.registerModule(new CoreJackson2Module());
+        // ... your other configuration
+//        return mapper;
+//    }
 }

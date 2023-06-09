@@ -19,7 +19,7 @@ import java.util.Objects;
  * TODO 自定义实现可以继承接口实现方法，使用 Redis 缓存。
  */
 @Slf4j
-@Service
+//@Service
 public class ApplicationOAuth2AuthorizationService implements OAuth2AuthorizationService {
 
     private final OAuth2AuthorizationService delegate = new InMemoryOAuth2AuthorizationService();

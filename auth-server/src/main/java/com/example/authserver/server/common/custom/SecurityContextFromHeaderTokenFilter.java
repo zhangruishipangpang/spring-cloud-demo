@@ -82,7 +82,8 @@ public class SecurityContextFromHeaderTokenFilter extends OncePerRequestFilter {
 
     private boolean requireParseToken(HttpServletRequest request) {
         return StringUtils.isNotBlank(findHeaderToken(request)) &&
-            Objects.isNull(this.securityContextHolderStrategy.getContext());
+            (Objects.isNull(this.securityContextHolderStrategy.getContext()) ||
+                Objects.isNull(this.securityContextHolderStrategy.getContext().getAuthentication()));
     }
 
     private String findHeaderToken(HttpServletRequest request) {

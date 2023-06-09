@@ -2,6 +2,7 @@ package com.example.authserver.server.common.custom;
 
 import com.example.authserver.server.common.custom.extension.VerificationCodeAuthenticationExtension;
 import com.example.authserver.server.common.custom.user.ClientAuthenticationMethod;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,6 +16,7 @@ import java.util.Objects;
 /**
  * @author: 长安
  */
+//@JsonDeserialize
 public class UserCustomAuthenticationToken extends UsernamePasswordAuthenticationToken {
 
     private final Integer DEFAULT_INITIAL_CAPACITY = 1 << 2;
@@ -23,15 +25,15 @@ public class UserCustomAuthenticationToken extends UsernamePasswordAuthenticatio
     private final Map<Class<? extends CustomAuthenticationType>, Boolean> authenticationTypeSwitch = new HashMap<>(DEFAULT_INITIAL_CAPACITY);
     private final Map<Class<? extends CustomAuthenticationType>, Map<String, Object>> authenticationType = new HashMap<>(DEFAULT_INITIAL_CAPACITY);
 
-    private UserCustomAuthenticationToken(String verificationCode, Object principal, Object credentials) {
-        this(principal, credentials);
-    }
+//    public UserCustomAuthenticationToken(String verificationCode, Object principal, Object credentials) {
+//        this(principal, credentials);
+//    }
 
     private UserCustomAuthenticationToken(Object principal, Object credentials) {
         super(principal, credentials); // 未认证
     }
 
-    public UserCustomAuthenticationToken(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
+    private UserCustomAuthenticationToken(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
         super(principal, credentials, authorities); // 已认证
     }
 
