@@ -19,8 +19,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
-import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationService;
-import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationCode;
+import org.springframework.security.oauth2.server.authorization.*;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationConsentAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
@@ -69,10 +68,17 @@ public class AuthorizationServerConfiguration2 {
             })
             /*
                 认证后token存储配置，默认在内存，可配置Redis与DB
-                TODO 需要改造这里使其可以将token信息存储到缓存中
+                TODO 需要改造这里使其可以将token信息存储到缓存中  直接生成Bean
+                配置的时候：会先获取shareObject 如果为空则获取Bean
              */
-            .authorizationService(new InMemoryOAuth2AuthorizationService())
+//            .authorizationService(new InMemoryOAuth2AuthorizationService())
             .oidc(Customizer.withDefaults()) // Enable OpenID Connect 1.0
+            /*
+                允许授权Service，用于用户验证权限
+                TODO 需要改造这里使其可以将授权客户端信息存储到缓存中 直接生成Bean
+                配置的时候：会先获取shareObject 如果为空则获取Bean
+             */
+//            .authorizationConsentService()
         ;
 
         http
@@ -91,12 +97,44 @@ public class AuthorizationServerConfiguration2 {
         return http.build();
     }
 
+    /**
+     * Client 获取，使用持久化的方式
+     * @param jdbcTemplate jdbcTemplate
+     * @return RegisteredClientRepository
+     */
     @Bean
     public RegisteredClientRepository registeredClientRepository(@Qualifier("customJdbcTemplate") JdbcTemplate jdbcTemplate) {
 
         return new JdbcRegisteredClientRepository(jdbcTemplate);
     }
 
+    /**
+     * OAuth2 认证信息存储
+     * @param jdbcTemplate jdbcTemplate
+     * @param registeredClientRepository registeredClientRepository
+     * @return OAuth2AuthorizationService
+     */
+    @Bean
+    public OAuth2AuthorizationService oAuth2AuthorizationService(@Qualifier("customJdbcTemplate") JdbcTemplate jdbcTemplate, RegisteredClientRepository registeredClientRepository) {
+        return new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
+    }
+
+    /**
+     * OAuth2 同意授权信息存储
+     * @param jdbcTemplate jdbcTemplate
+     * @param registeredClientRepository registeredClientRepository
+     * @return OAuth2AuthorizationConsentService
+     */
+    @Bean
+    public OAuth2AuthorizationConsentService oAuth2AuthorizationConsentService(@Qualifier("customJdbcTemplate") JdbcTemplate jdbcTemplate, RegisteredClientRepository registeredClientRepository) {
+        return new JdbcOAuth2AuthorizationConsentService(jdbcTemplate, registeredClientRepository);
+    }
+
+
+    /**
+     * 配置OAuth2接口信息
+     * @return AuthorizationServerSettings
+     */
     @Bean
     public AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder().build();
@@ -108,10 +146,8 @@ public class AuthorizationServerConfiguration2 {
             for (AuthenticationProvider authenticationProvider : authenticationProviders) {
                 log.info(" consumer authenticationProvider , current -> {} ", authenticationProvider.getClass().getName());
                 if(authenticationProvider instanceof OAuth2AuthorizationCodeRequestAuthenticationProvider oAuth2AuthorizationCodeRequestAuthenticationProvider) {
-
                     oAuth2AuthorizationCodeRequestAuthenticationProvider.setAuthorizationCodeGenerator(authorizationCodeGenerator());
                 } else if(authenticationProvider instanceof OAuth2AuthorizationConsentAuthenticationProvider oAuth2AuthorizationConsentAuthenticationProvider) {
-
                     oAuth2AuthorizationConsentAuthenticationProvider.setAuthorizationCodeGenerator(authorizationCodeGenerator());
                 }
             }
