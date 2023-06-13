@@ -12,8 +12,8 @@
         <module name="common-tools" />
         <module name="webflux-servlet" />
         <module name="gateway" />
-        <module name="letter-server" />
         <module name="netty-server" />
+        <module name="letter-server" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
