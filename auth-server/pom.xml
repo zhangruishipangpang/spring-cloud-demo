@@ -127,6 +127,7 @@
     </dependencyManagement>
 
     <build>
+        <finalName>auth-server</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -144,7 +145,8 @@
                 <version>${spring-boot.version}</version>
                 <configuration>
                     <mainClass>com.example.authserver.AuthServerApplication</mainClass>
-                    <skip>true</skip>
+<!--                    <skip>true</skip>-->
+                    <includeSystemScope>true</includeSystemScope>
                 </configuration>
                 <executions>
                     <execution>

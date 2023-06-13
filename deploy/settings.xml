@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+
+
+    <servers>
+    </servers>
+
+    <mirrors>
+        <mirror>
+            <id>public</id>
+            <name>aliyun maven</name>
+            <!--      <url>http://maven.aliyun.com/nexus/content/groups/public/</url>-->
+            <url>https://maven.aliyun.com/repository/public</url>
+            <!--      <mirrorOf>central</mirrorOf>--> <!-- 指代只是用通过配置的镜像仓库的包， 而不会获取网络上其他仓库包-->
+            <mirrorOf>central</mirrorOf>
+        </mirror>
+
+
+
+
+    </mirrors>
+
+    <profiles>
+        <profile>
+
+            <id>aliyun-central-profile</id>
+
+            <activation>
+            </activation>
+
+            <repositories>
+                <repository>
+                    <id>aliyun-central</id>
+                    <url>https://maven.aliyun.com/repository/central</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
+
+    </profiles>
+
+</settings>

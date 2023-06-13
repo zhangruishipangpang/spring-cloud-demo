@@ -24,6 +24,7 @@ import java.util.Objects;
  * @author: 长安
  * 用户登录成功返回 token
  */
+@SuppressWarnings("rawtypes")
 @Slf4j
 public class JwtTokenAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 

@@ -1,0 +1,16 @@
+#FROM maven:3-amazoncorretto-17 as builder
+FROM self-maven:0.0.2 as builder
+WORKDIR /src/
+ADD ./ /src/
+RUN cd /src \
+    mvn clean package -pl auth-server -am -Dmaven.test.skip=true
+
+FROM openjdk:17.0-jdk-oracle
+MAINTAINER changan <18846439952@163.com>
+WORKDIR /src/
+ENV JVM_CONFIG="-Xmx125M -Xms125M -Xss125M"
+COPY --from=builder /src/auth-server/target/auth-server.jar .
+EXPOSE 9090
+RUN ls && chmod -x ./auth-server.jar
+RUN echo $JVM_CONFIG
+ENTRYPOINT java $JVM_CONFIG -jar auth-server.jar
