@@ -5,6 +5,7 @@ import com.example.authserver.server.common.custom.store.VerificationCodeStoreSe
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.code.kaptcha.util.Config;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.jackson2.CoreJackson2Module;
@@ -16,6 +17,7 @@ import java.util.Properties;
 /**
  * @author: 长安
  */
+@EnableDiscoveryClient(autoRegister = false)
 @Configuration
 public class CommonConfiguration {
 

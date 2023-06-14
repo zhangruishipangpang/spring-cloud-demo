@@ -1,0 +1,13 @@
+spring:
+    application:
+        name: auth-server
+    cloud:
+        nacos:
+            discovery:
+                server-addr: 118.31.44.4:8848
+            config:
+                file-extension: yml
+                extension-configs:
+                    - data-id: datasource.yml
+                      group: DEFAULT_GROUP
+                server-addr: 118.31.44.4:8848

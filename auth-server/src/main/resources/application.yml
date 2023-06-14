@@ -7,18 +7,18 @@ logging:
     level:
         org.springframework.security: trace
         com.example: trace
-#        org: trace
+#        org: debug
 spring:
     jpa:
         # 更新表结构，可以在控制台执行修改表结构的SQL语句
         hibernate:
-            ddl-auto: update
+            ddl-auto: none
         show-sql: true
         database: MYSQL
     datasource:
         driver-class-name: com.mysql.cj.jdbc.Driver
-        jdbcUrl: jdbc:mysql://127.0.0.1:13306/self_database
-        url: jdbc:mysql://127.0.0.1:13306/self_database
+        jdbcUrl: jdbc:mysql://120.27.246.198:3306/self_database
+        url: jdbc:mysql://120.27.246.198:3306/self_database
         username: root
         password: 123456
         #    初始化数量
