@@ -122,6 +122,10 @@ public class AuthorizationServerConfiguration2 {
      */
     @Bean
     public OAuth2AuthorizationService oAuth2AuthorizationService(@Qualifier("customJdbcTemplate") JdbcTemplate jdbcTemplate, @Qualifier("registeredClientRepository") RegisteredClientRepository registeredClientRepository) {
+        /*
+            这里可能会打印异常：ClassNotFoundException:org.springframework.security.cas.jackson2.CasJackson2Module
+            无需理会，security版本修改了module但代码未同步修改，可能更高版本已经修复了
+         */
         JdbcOAuth2AuthorizationService authorizationService = new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
         JdbcOAuth2AuthorizationService.OAuth2AuthorizationRowMapper authorizationRowMapper = new JdbcOAuth2AuthorizationService.OAuth2AuthorizationRowMapper(
             registeredClientRepository);

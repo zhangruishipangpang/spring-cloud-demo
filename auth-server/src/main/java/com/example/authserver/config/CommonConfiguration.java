@@ -17,7 +17,7 @@ import java.util.Properties;
 /**
  * @author: 长安
  */
-@EnableDiscoveryClient(autoRegister = false)
+@EnableDiscoveryClient(autoRegister = true)
 @Configuration
 public class CommonConfiguration {
 

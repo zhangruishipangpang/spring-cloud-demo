@@ -3,11 +3,17 @@ spring:
         name: auth-server
     cloud:
         nacos:
+            username: cloud-rw
+            password: cloud&master001
             discovery:
                 server-addr: 118.31.44.4:8848
+                namespace: f17c01aa-6a56-43e0-a64e-12cc2f04d88f
             config:
+                server-addr: ${spring.cloud.nacos.discovery.server-addr}
+                namespace: ${spring.cloud.nacos.discovery.namespace}
                 file-extension: yml
                 extension-configs:
                     - data-id: datasource.yml
                       group: DEFAULT_GROUP
-                server-addr: 118.31.44.4:8848
+            
+            

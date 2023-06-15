@@ -15,22 +15,22 @@ spring:
             ddl-auto: none
         show-sql: true
         database: MYSQL
-    datasource:
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        jdbcUrl: jdbc:mysql://120.27.246.198:3306/self_database
-        url: jdbc:mysql://120.27.246.198:3306/self_database
-        username: root
-        password: 123456
-        #    初始化数量
-        initialSize: 5
-        #    允许的最小空闲连接数
-        minIdle: 5
-        #    最大活跃数
-        maxActive: 20
-        #    最大连接等待超时时间，单位是毫秒(ms)
-        maxWait: 60000
-        hikari:
-            maximum-pool-size: 5
+#    datasource:
+#        driver-class-name: com.mysql.cj.jdbc.Driver
+#        jdbcUrl: jdbc:mysql://120.27.246.198:3306/self_database
+#        url: jdbc:mysql://120.27.246.198:3306/self_database
+#        username: root
+#        password: 123456
+#        #    初始化数量
+#        initialSize: 5
+#        #    允许的最小空闲连接数
+#        minIdle: 5
+#        #    最大活跃数
+#        maxActive: 20
+#        #    最大连接等待超时时间，单位是毫秒(ms)
+#        maxWait: 60000
+#        hikari:
+#            maximum-pool-size: 5
 #        ======  h2  ======
         # 嵌入模式，当前项目目录，进程关闭数据保留
         # 详情见：http://www.h2database.com/html/features.html#database_url
