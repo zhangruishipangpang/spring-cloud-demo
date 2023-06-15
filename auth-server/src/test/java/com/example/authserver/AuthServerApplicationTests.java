@@ -106,7 +106,7 @@ class AuthServerApplicationTests {
     @Test
     void test_insertJdbcClient() {
         RegisteredClient client = RegisteredClient.withId(UUID.randomUUID().toString())
-            .clientId("messaging-client2")
+            .clientId("messaging-client3")
             .clientSecret(new BCryptPasswordEncoder().encode("secret"))
             .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
             .authorizationGrantTypes(authorizationGrantTypes -> {
@@ -115,7 +115,7 @@ class AuthServerApplicationTests {
                 authorizationGrantTypes.add(AuthorizationGrantType.CLIENT_CREDENTIALS);
             })
             .redirectUris(urls -> {
-                urls.add("http://127.0.0.1:8080/authorized");
+                urls.add("http://127.0.0.1:11001/unAuth/receiver");
                 urls.add("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc");
             })
             .scopes(scopeSet -> {
@@ -124,10 +124,10 @@ class AuthServerApplicationTests {
                 scopeSet.add("message.read");
                 scopeSet.add("message.write");
             })
-            .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+            .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
             .clientIdIssuedAt(Instant.now())
             .clientSecretExpiresAt(Instant.now().plus(100, ChronoUnit.DAYS))
-            .clientName("测试客户端配置")
+            .clientName("测试客户端配置3")
             .tokenSettings(TokenSettings.builder().build())
             .build();
 
