@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoGeneratorSettingsState">
+    <option name="ignoredFields">
+      <set>
+        <option value="" />
+      </set>
+    </option>
+    <option name="moduleName" value="auth-server" />
+    <option name="moduleNameToSettings">
+      <map>
+        <entry key="auth-server">
+          <value>
+            <ModuleSettings>
+              <option name="controllerParentDirectory" value="$PROJECT_DIR$/auth-server/src/main/java" />
+              <option name="dtoParentDirectory" value="$PROJECT_DIR$/auth-server/src/main/java" />
+              <option name="entityPackageName" value="com.example.authserver.general.entity" />
+              <option name="entityParentDirectory" value="$PROJECT_DIR$/auth-server/src/main/java" />
+              <option name="mapperXmlParentDirectory" value="D:\PROJECT\My_Project\Spring-Cloud-Demo\auth-server\src\main\resources" />
+              <option name="repositoryPackageName" value="com.example.authserver.general.repository" />
+              <option name="repositoryParentDirectory" value="$PROJECT_DIR$/auth-server/src/main/java" />
+              <option name="serviceParentDirectory" value="$PROJECT_DIR$/auth-server/src/main/java" />
+              <option name="voParentDirectory" value="$PROJECT_DIR$/auth-server/src/main/java" />
+            </ModuleSettings>
+          </value>
+        </entry>
+        <entry key="boot-l-jdk17">
+          <value>
+            <ModuleSettings />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="removeFieldPrefix" value="" />
+    <option name="useFluidProgrammingStyle" value="true" />
+    <option name="useJava8DateType" value="true" />
+  </component>
+  <component name="DatabaseSettingsState">
+    <option name="language" value="zh-CN" />
+  </component>
+</project>

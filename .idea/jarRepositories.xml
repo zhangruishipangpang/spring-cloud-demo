@@ -9,6 +9,11 @@
     <remote-repository>
       <option name="id" value="central" />
       <option name="name" value="Central Repository" />
+      <option name="url" value="http://caazdp.top:18081/repository/maven-public" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Central Repository" />
       <option name="url" value="https://nexus-inner.cpgroupcloud.com/repository/public/" />
     </remote-repository>
     <remote-repository>

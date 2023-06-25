@@ -5,6 +5,8 @@
     <file url="file://$PROJECT_DIR$/auth-server/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common-tools/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common-tools/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/data-sync-sql/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/data-sync2/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/letter-server/src/main/java" charset="UTF-8" />

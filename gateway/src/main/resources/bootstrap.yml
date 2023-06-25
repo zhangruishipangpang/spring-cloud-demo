@@ -3,9 +3,16 @@ spring:
         name: gateway
     cloud:
         nacos:
+            username: cloud-rw
+            password: cloud&master001
             discovery:
                 server-addr: 118.31.44.4:8848
-#                ephemeral: false # CP
+                namespace: f17c01aa-6a56-43e0-a64e-12cc2f04d88f
                 naming-load-cache-at-start: true
             config:
-                enabled: false
+                server-addr: ${spring.cloud.nacos.discovery.server-addr}
+                namespace: ${spring.cloud.nacos.discovery.namespace}
+                file-extension: yml
+                extension-configs:
+                    - data-id: datasource.yml
+                      group: DEFAULT_GROUP

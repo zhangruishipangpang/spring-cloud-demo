@@ -2,32 +2,38 @@ package com.example.authserver.general.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
-/**
- * @Auther: 长安
- */
+import java.io.Serializable;
+
 @Data
 @Entity
-@Table(name = "USER_INFORMATION_MESSAGE")
-public class UserInformationMessage {
+@Accessors(chain = true)
+@Table(name = "user_information_message")
+public class UserInformationMessage implements Serializable {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private static final long serialVersionUID = 1L;
+
     @Id
-    @Column(name = "ID", length = 11)
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Basic
-    @Column(name = "email", length = 64)
+    @Column(name = "email")
     private String email;
 
-    @Basic
-    @Column(name = "id_card", unique = true, length = 32)
+    @Column(name = "head_portrait")
+    private String headPortrait;
+
+    @Column(name = "id_card")
     private String idCard;
 
-    @Basic
-    @Column(name = "sex", length = 3)
+    @Column(name = "sex")
     private String sex;
+    /**
+     * 用户信息
+     */
+    @Column(name = "nick", nullable = false)
+    private String nick;
 
-    @Column(name = "face_id", length = 128)
-    private String faceId;
 }

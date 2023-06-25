@@ -24,6 +24,10 @@
             问题描述：
                 每次请求会被重复执行两次，有两个FilterProxyChain链，并且第二次执行的链不会有自定义的filter，导致第二次执行时Request变化没有找到登录
                 用户的凭证，最终影响登录状态。
+
+            问题原因：
+                security 可配置一下参数来控制请求不开启线程
+                    spring.security.filter.dispatcher-types[0]=request
             -->
         <spring-boot.version>3.0.2</spring-boot.version>
     </properties>
@@ -118,6 +122,16 @@
             <groupId>com.github.penggle</groupId>
             <artifactId>kaptcha</artifactId>
             <version>2.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ca.commons</groupId>
+            <artifactId>commons-tools</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
