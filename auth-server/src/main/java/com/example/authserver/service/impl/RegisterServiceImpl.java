@@ -7,6 +7,8 @@ import com.example.authserver.general.entity.Oauth2ApplicationUser;
 import com.example.authserver.general.repository.Oauth2ApplicationUserRepository;
 import com.example.authserver.model.register.mobile.MobileRegisterForm;
 import com.example.authserver.model.register.mobile.MobileRegisterVo;
+import com.example.authserver.model.register.sms.SendSmsForm;
+import com.example.authserver.server.common.custom.store.SmsCodeStoreService;
 import com.example.authserver.service.RegisterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class RegisterServiceImpl implements RegisterService {
     private final String DEFAULT_CODE = "123456";
 
     private final SmsClient smsClient;
+    private final SmsCodeStoreService smsCodeStoreService;
     private final Oauth2ApplicationUserRepository userRepository;
 
 
@@ -57,5 +60,13 @@ public class RegisterServiceImpl implements RegisterService {
             .nick(form.getNick())
             .mobile(saved.getMobile())
             .build();
+    }
+
+    @Override
+    public Boolean sendSms(SendSmsForm form) {
+
+
+
+        return null;
     }
 }

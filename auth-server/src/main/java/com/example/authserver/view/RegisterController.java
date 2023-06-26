@@ -3,6 +3,7 @@ package com.example.authserver.view;
 import ca.commons.response.ResponseBody;
 import com.example.authserver.model.register.mobile.MobileRegisterForm;
 import com.example.authserver.model.register.mobile.MobileRegisterVo;
+import com.example.authserver.model.register.sms.SendSmsForm;
 import com.example.authserver.service.RegisterService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,10 +21,16 @@ public class RegisterController {
     @Resource
     private RegisterService registerService;
 
+
     @PostMapping("/mobile")
     public ResponseBody<MobileRegisterVo> registerNew(MobileRegisterForm form) {
         return ResponseBody.success(
             registerService.mobileRegister(form)
         );
+    }
+
+    @PostMapping("/sms")
+    public ResponseBody<Boolean> sendSms(SendSmsForm form) {
+        return ResponseBody.success();
     }
 }
