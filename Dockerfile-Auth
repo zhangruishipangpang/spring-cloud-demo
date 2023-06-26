@@ -1,5 +1,5 @@
 #FROM maven:3-amazoncorretto-17 as builder
-FROM self-maven:0.0.2 as builder
+FROM registry.cn-hangzhou.aliyuncs.com/changan_hub/self-maven:3.0.0 as builder
 WORKDIR /src/
 ADD ./ /src/
 RUN mvn clean package -pl auth-server -am -Dmaven.test.skip=true

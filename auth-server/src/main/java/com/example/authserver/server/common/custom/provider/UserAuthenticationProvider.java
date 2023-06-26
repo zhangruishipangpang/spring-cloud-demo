@@ -1,11 +1,9 @@
 package com.example.authserver.server.common.custom.provider;
 
 import com.example.authserver.server.common.custom.ProviderOrdered;
-import com.example.authserver.server.common.custom.UserCustomAuthenticationToken;
+import com.example.authserver.server.common.custom.token.UserCustomAuthenticationToken;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

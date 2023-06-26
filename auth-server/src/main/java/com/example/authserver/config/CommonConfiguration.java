@@ -1,5 +1,8 @@
 package com.example.authserver.config;
 
+import ca.commons.sms.SmsClient;
+import com.example.authserver.server.common.custom.store.SmsCodeStoreService;
+import com.example.authserver.server.common.custom.store.SmsCodeStoreServiceImpl;
 import com.example.authserver.server.common.custom.store.VerificationCodeStoreService;
 import com.example.authserver.server.common.custom.store.VerificationCodeStoreServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,11 +45,15 @@ public class CommonConfiguration {
         return new VerificationCodeStoreServiceImpl();
     }
 
-//    @Bean
-//    public ObjectMapper objectMapper() {
-//        ObjectMapper mapper = new ObjectMapper();
-//        mapper.registerModule(new CoreJackson2Module());
-        // ... your other configuration
-//        return mapper;
-//    }
+    @Bean
+    @ConditionalOnMissingBean
+    public SmsCodeStoreService service() {
+        return new SmsCodeStoreServiceImpl();
+    }
+
+    @Bean
+    public SmsClient smsClient() {
+        return new SmsClient();
+    }
+
 }

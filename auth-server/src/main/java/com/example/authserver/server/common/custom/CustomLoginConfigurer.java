@@ -1,10 +1,13 @@
 package com.example.authserver.server.common.custom;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
+import org.springframework.security.oauth2.server.authorization.web.authentication.DelegatingAuthenticationConverter;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.ForwardAuthenticationSuccessHandler;
@@ -16,6 +19,7 @@ import java.util.Objects;
 /**
  * @author: 长安
  */
+@Slf4j
 public class CustomLoginConfigurer<H extends HttpSecurityBuilder<H>>  extends
     AbstractAuthenticationFilterConfigurer<H, CustomLoginConfigurer<H>, UserAuthenticationFilter> {
 
@@ -33,7 +37,7 @@ public class CustomLoginConfigurer<H extends HttpSecurityBuilder<H>>  extends
     }
 
     public CustomLoginConfigurer<H> authenticationConverter(AuthenticationConverter authenticationConverter) {
-        getAuthenticationFilter().setAuthenticationConverter(authenticationConverter);
+        this.getAuthenticationFilter().setAuthenticationConverter(authenticationConverter);
         return this;
     }
 

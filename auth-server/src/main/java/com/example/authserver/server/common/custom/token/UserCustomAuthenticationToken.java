@@ -1,8 +1,8 @@
-package com.example.authserver.server.common.custom;
+package com.example.authserver.server.common.custom.token;
 
+import com.example.authserver.server.common.custom.CustomAuthenticationType;
 import com.example.authserver.server.common.custom.extension.VerificationCodeAuthenticationExtension;
 import com.example.authserver.server.common.custom.user.ClientAuthenticationMethod;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,11 +29,11 @@ public class UserCustomAuthenticationToken extends UsernamePasswordAuthenticatio
 //        this(principal, credentials);
 //    }
 
-    private UserCustomAuthenticationToken(Object principal, Object credentials) {
+    protected UserCustomAuthenticationToken(Object principal, Object credentials) {
         super(principal, credentials); // 未认证
     }
 
-    private UserCustomAuthenticationToken(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
+    protected UserCustomAuthenticationToken(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
         super(principal, credentials, authorities); // 已认证
     }
 

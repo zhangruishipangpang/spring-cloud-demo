@@ -1,7 +1,6 @@
 package com.example.authserver.server.common.custom;
 
 import com.example.authserver.server.common.custom.provider.UserAuthenticationProvider;
-import com.example.authserver.server.common.custom.provider.VerificationCodeProvider;
 import lombok.Getter;
 
 /**
@@ -13,6 +12,8 @@ public enum ProviderOrdered {
     VERIFICATION_CODE_PROVIDER,
     // 用户名密码基础认证
     USER_AUTHENTICATION_PROVIDER,
+    // 手机号验证码登录
+    MOBILE_AUTHENTICATION_PROVIDER,
     ;
     private Class<? extends UserAuthenticationProvider> clz;
 

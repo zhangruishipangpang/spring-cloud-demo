@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 import com.example.authserver.server.auth.custom.jackson.UserCustomAuthenticationTokenMixin;
 import com.example.authserver.server.common.custom.SecurityContextFromHeaderTokenFilter;
 
-import com.example.authserver.server.common.custom.UserCustomAuthenticationToken;
+import com.example.authserver.server.common.custom.token.UserCustomAuthenticationToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Contract;

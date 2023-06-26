@@ -1,7 +1,7 @@
 package com.example.authserver.server.common.custom.extension;
 
 import com.example.authserver.server.common.custom.CustomAuthenticationType;
-import com.example.authserver.server.common.custom.UserCustomAuthenticationToken;
+import com.example.authserver.server.common.custom.token.UserCustomAuthenticationToken;
 import com.example.authserver.server.common.custom.ex.VerificationCodeException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;

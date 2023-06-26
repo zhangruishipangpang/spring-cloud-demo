@@ -1,16 +1,14 @@
 package com.example.authserver.server.auth.custom;
 
-import com.example.authserver.server.common.custom.UserCustomAuthenticationToken;
+import com.example.authserver.server.common.custom.token.UserCustomAuthenticationToken;
 import com.example.authserver.server.common.custom.store.TokenStoreService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
-import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 

@@ -1,7 +1,5 @@
 package com.example.authserver.server.common.custom.store;
 
-import org.springframework.security.core.Authentication;
-
 /**
  * @author: 长安
  */

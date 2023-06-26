@@ -2,7 +2,7 @@ package com.example.authserver.server.common.custom.convert;
 
 import com.example.authserver.server.common.custom.AuthenticationMethodService;
 import com.example.authserver.server.common.custom.UserAuthenticationFilter;
-import com.example.authserver.server.common.custom.UserCustomAuthenticationToken;
+import com.example.authserver.server.common.custom.token.UserCustomAuthenticationToken;
 import com.example.authserver.server.common.custom.extension.AuthenticationOperationExtension;
 import com.example.authserver.server.common.custom.extension.DelegatingAuthenticationOperationExtension;
 import com.example.authserver.server.common.custom.extension.VerificationCodeAuthenticationExtension;
@@ -13,19 +13,19 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.Ordered;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author: 长安
  * parse request parameter [username, password ...]
  */
 @Slf4j
-public abstract class AbstractAuthenticationConverter implements AuthenticationConverter {
+public abstract class AbstractAuthenticationConverter implements AuthenticationConverter, Ordered {
 
     @Setter private String username = "username";
     @Setter private String password = "password";
@@ -90,16 +90,8 @@ public abstract class AbstractAuthenticationConverter implements AuthenticationC
         return new String[]{username, password};
     }
 
-    /**
-     *
-     * @param userCustomAuthenticationToken check it
-     * @param request HttpServletRequest
-     */
-    protected void preAuthenticationCheck(Authentication userCustomAuthenticationToken, HttpServletRequest request) {
-        Objects.requireNonNull(userCustomAuthenticationToken.getPrincipal(), "username is null");
-        Objects.requireNonNull(userCustomAuthenticationToken.getCredentials(), "password is null");
+    @Override
+    public int getOrder() {
+        return Ordered.LOWEST_PRECEDENCE;
     }
-
-    protected void extraAuthentication(Authentication token, HttpServletRequest request) {}
-
 }

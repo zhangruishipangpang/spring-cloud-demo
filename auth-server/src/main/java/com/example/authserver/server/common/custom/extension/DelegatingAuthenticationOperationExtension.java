@@ -1,7 +1,6 @@
 package com.example.authserver.server.common.custom.extension;
 
-import com.example.authserver.server.common.custom.UserCustomAuthenticationToken;
-import com.example.authserver.server.common.custom.ex.ExtensionException;
+import com.example.authserver.server.common.custom.token.UserCustomAuthenticationToken;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.*;

@@ -35,9 +35,13 @@ public class CommonSecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(List<UserAuthenticationProvider> providers, UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+    public AuthenticationManager authenticationManager(
+//                                                      List<UserAuthenticationProvider> providers,
+                                                       List<AuthenticationProvider> providers,
+                                                       UserDetailsService userDetailsService,
+                                                       PasswordEncoder passwordEncoder) {
         List<AuthenticationProvider> providerList = new ArrayList<>(providers);
-        providerList.add(new UserAuthenticationProvider(userDetailsService, passwordEncoder));
+//        providerList.add(new UserAuthenticationProvider(userDetailsService, passwordEncoder));
         AnnotationAwareOrderComparator.sort(providerList);
         return new ProviderManager(providerList);
     }

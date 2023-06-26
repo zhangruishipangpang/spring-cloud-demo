@@ -15,11 +15,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.server.authorization.web.authentication.DelegatingAuthenticationConverter;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.util.matcher.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -33,7 +35,7 @@ public class UserAuthenticationFilter extends AbstractAuthenticationProcessingFi
 
     private final String loginPath = DEFAULT_LOGIN_PATH;
 
-    @Setter @Getter private AuthenticationConverter authenticationConverter = new DefaultAuthenticationConverter();
+    @Setter @Getter private AuthenticationConverter authenticationConverter = new DelegatingAuthenticationConverter(Arrays.asList(new DefaultAuthenticationConverter()));
 
     public UserAuthenticationFilter(boolean placeholder) {
         super(DEFAULT_LOGIN_PATH);

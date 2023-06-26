@@ -1,5 +1,8 @@
 package com.example.authserver.server.common;
 
+import com.example.authserver.server.common.custom.convert.AbstractAuthenticationConverter;
+import com.example.authserver.server.common.custom.convert.DefaultAuthenticationConverter;
+import com.example.authserver.server.common.custom.convert.MobileAuthenticationConverter;
 import com.example.authserver.server.common.custom.handler.JwtTokenAuthenticationSuccessHandler;
 import com.example.authserver.server.common.custom.SecurityContextFromHeaderTokenFilter;
 import com.example.authserver.server.auth.custom.token.DefaultTokenParser;
@@ -11,6 +14,7 @@ import jakarta.servlet.Filter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,10 +22,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.server.authorization.web.authentication.DelegatingAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author 长安
@@ -55,7 +64,8 @@ public class DefaultSecurityConfig {
                 authorize
                     .requestMatchers("/auth/**").hasRole("USER")
                     .requestMatchers("/unAuth/**", "/login",
-                        "/favicon.ico", "/error", "/verification_code/**").permitAll()
+                        "/favicon.ico", "/error", "/verification_code/**",
+                        "/register/**").permitAll()
                     .requestMatchers("/").authenticated()
                     .anyRequest().authenticated()
             )
@@ -74,10 +84,18 @@ public class DefaultSecurityConfig {
         // 这里用来添加Security拦截器排序占位符
         http.addFilterAt(new UserAuthenticationFilter(false), UsernamePasswordAuthenticationFilter.class);
 
+        List<AuthenticationConverter> converters = Arrays.asList(
+            new DefaultAuthenticationConverter(),
+            new MobileAuthenticationConverter()
+        );
+
+        AnnotationAwareOrderComparator.sort(converters);
+
         http.apply(new CustomLoginConfigurer<>())
                 .successHandler(authenticationSuccessHandler())
                 .loginProcessingUrl(UserAuthenticationFilter.DEFAULT_LOGIN_PATH)
                 .failureHandler(new UserCustomAuthenticationFailureHandler())
+                .authenticationConverter(new DelegatingAuthenticationConverter(converters))
         ;
 
 

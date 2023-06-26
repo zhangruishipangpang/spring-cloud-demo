@@ -1,11 +1,10 @@
 package com.example.authserver.server.common.custom.provider;
 
 import com.example.authserver.server.common.custom.ProviderOrdered;
-import com.example.authserver.server.common.custom.UserCustomAuthenticationToken;
+import com.example.authserver.server.common.custom.token.UserCustomAuthenticationToken;
 import com.example.authserver.server.common.custom.ex.VerificationCodeException;
 import com.example.authserver.server.common.custom.extension.VerificationCodeAuthenticationExtension;
 import com.example.authserver.server.common.custom.store.VerificationCodeStoreService;
-import com.example.authserver.server.common.custom.store.VerificationCodeStoreServiceImpl;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
