@@ -32,6 +32,9 @@ public class SmsCodeStoreServiceImpl implements SmsCodeStoreService {
         // for testing
         smsCodeStore.put("18846439952", "123456");
         smsCodeExpire.put("18846439952", Instant.now().plus(100, ChronoUnit.DAYS));
+
+        smsCodeStore.put("12345678910", "123456");
+        smsCodeExpire.put("12345678910", Instant.now().plus(100, ChronoUnit.DAYS));
     }
 
     @Override

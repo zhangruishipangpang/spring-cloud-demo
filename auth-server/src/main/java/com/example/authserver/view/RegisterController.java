@@ -6,7 +6,9 @@ import com.example.authserver.model.register.mobile.MobileRegisterVo;
 import com.example.authserver.model.register.sms.SendSmsForm;
 import com.example.authserver.service.RegisterService;
 import jakarta.annotation.Resource;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,7 +25,7 @@ public class RegisterController {
 
 
     @PostMapping("/mobile")
-    public ResponseBody<MobileRegisterVo> registerNew(MobileRegisterForm form) {
+    public ResponseBody<MobileRegisterVo> registerNew(@RequestBody @Validated MobileRegisterForm form) {
         return ResponseBody.success(
             registerService.mobileRegister(form)
         );

@@ -12,6 +12,7 @@ import com.example.authserver.server.common.custom.store.SmsCodeStoreService;
 import com.example.authserver.service.RegisterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 import static java.lang.String.format;
@@ -32,10 +33,12 @@ public class RegisterServiceImpl implements RegisterService {
 
 
     @Override
+    @Transactional
     public MobileRegisterVo mobileRegister(MobileRegisterForm form) {
 
-        if(DEFAULT_CODE.equals(form.getSmsCode())) {
-            // not check
+        // check sms
+        if(!smsCodeStoreService.hasSmsCode(form.getMobile())) {
+            throw new RegisterException("验证码不正确！");
         }
 
         // check mobile exist
@@ -55,6 +58,8 @@ public class RegisterServiceImpl implements RegisterService {
 
         Oauth2ApplicationUser saved = userRepository.save(newUser);
 
+        smsCodeStoreService.evictSmsCode(form.getMobile());
+
         return MobileRegisterVo.builder()
             .username(username)
             .nick(form.getNick())
@@ -64,7 +69,6 @@ public class RegisterServiceImpl implements RegisterService {
 
     @Override
     public Boolean sendSms(SendSmsForm form) {
-
 
 
         return null;
